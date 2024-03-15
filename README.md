@@ -1,6 +1,9 @@
 # GRID-MAE
 
-- Investigate using multiscale grids in a Vision Transformer.
+- Investigate using multiscale grids in a Vision Transformer Masked Autoencoder.
+
+# Question
+- Will it be worth the computational requirements?
 
 # Prior Art
 ## SATMAE
