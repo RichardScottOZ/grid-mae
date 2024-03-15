@@ -29,6 +29,6 @@
 - Take another set at 200m resolution
 
 ### Padding
-- Planets, surface etc. - not rectangels
+- Planets, surface etc. - not rectangles
 	
 	
