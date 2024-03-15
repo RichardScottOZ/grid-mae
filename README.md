@@ -14,8 +14,14 @@
 	- To invesigate structure
 	- Presumably 3 band groupings for 10, 20 and 60m resolution patches around pictures of locations of interest - airports, zoos, etc.
 	- Designed to classify these
+### METADATA
 - Metadata file - csv with location/polygon coordinates, class type etc.	
 	- These are here https://raw.githubusercontent.com/fMoW/dataset/master/LICENSE
+#### Example
+	category	location_id	image_id	timestamp	polygon
+0	airport	0	6	2015-07-25T08:45:14Z	POLYGON ((32.666164117900003 39.932541952376475, 32.711078120537337 39.932541952376475, 32.711078120537337 39.967113357199999, 32.666164117900003 39.967113357199999, 32.666164117900003 39.932541952376475))
+	
+	
 	
 # Problem
 ## General
