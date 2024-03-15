@@ -86,10 +86,12 @@ class SatelliteDataset(Dataset):
 
 
 class SentinelNormalize:
+    # need to change this to general
     """
     Normalization for Sentinel-2 imagery, inspired from
     https://github.com/ServiceNow/seasonal-contrast/blob/8285173ec205b64bc3e53b880344dd6c3f79fa7a/datasets/bigearthnet_dataset.py#L111
     """
+    
     def __init__(self, mean, std):
         self.mean = np.array(mean)
         self.std = np.array(std)
@@ -103,6 +105,7 @@ class SentinelNormalize:
 
 
 class SentinelIndividualImageDataset(SatelliteDataset):
+    #need to change this to general    
     label_types = ['value', 'one-hot']
     mean = [1370.19151926, 1184.3824625 , 1120.77120066, 1136.26026392,
             1263.73947144, 1645.40315151, 1846.87040806, 1762.59530783,
