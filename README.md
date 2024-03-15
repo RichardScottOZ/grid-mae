@@ -38,5 +38,12 @@
 
 ### Overlap training tiles
 - Is this useful for autoencoders here beyond smoothing reasons
+
+### Input channels
+- Needs to be general
+
+### Groupings
+- Resolution groupings - this is a satmae parameter already
+
 	
 	
