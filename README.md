@@ -5,6 +5,9 @@
 # Question
 - Will it be worth the computational requirements?
 
+# Architecture
+- Smallest will likely do
+
 # Prior Art
 ## SATMAE
 - https://github.com/techmn/satmae_pp
@@ -84,3 +87,5 @@
 	- zen3geo: https://zen3geo.readthedocs.io/en/v0.2.0/chipping.html
 	- https://earthmover.io/blog/cloud-native-dataloader
 	- https://xbatcher.readthedocs.io/en/latest/
+	
+	
