@@ -28,7 +28,7 @@ warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 CATEGORIES = ["gravity", "magnetics"]
 
 
-class SatelliteDataset(Dataset):
+class GridDataset(Dataset):
     """
     Abstract class.
     """
@@ -81,11 +81,11 @@ class SatelliteDataset(Dataset):
 
 
 #########################################################
-# SENTINEL DEFINITIONS
+# GRID DEFINITIONS
 #########################################################
 
 
-class SentinelNormalize:
+class GridNormalize:
     # need to change this to general
     """
     Normalization for Sentinel-2 imagery, inspired from
@@ -104,7 +104,7 @@ class SentinelNormalize:
         return img
 
 
-class SentinelIndividualImageDataset(SatelliteDataset):
+class GridIndividualImageDataset(SatelliteDataset):
     #need to change this to general    
     label_types = ['value', 'one-hot']
     mean = [1370.19151926, 1184.3824625 , 1120.77120066, 1136.26026392,
@@ -255,7 +255,7 @@ class SentinelIndividualImageDataset(SatelliteDataset):
 
 ###################################################################################################################
 
-def build_fmow_dataset(is_train: bool, args) -> SatelliteDataset:
+def build_grid_dataset(is_train: bool, args) -> SatelliteDataset:
     """
     Initializes a SatelliteDataset object given provided args.
     :param is_train: Whether we want the dataset for training or evaluation
@@ -270,7 +270,7 @@ def build_fmow_dataset(is_train: bool, args) -> SatelliteDataset:
         transform = CustomDatasetFromImages.build_transform(is_train, args.input_size*2, mean, std)
         dataset = CustomDatasetFromImages(file_path, transform)
 
-    elif args.dataset_type == 'sentinel':
+    elif args.dataset_type == 'grid':
         mean = SentinelIndividualImageDataset.mean
         std = SentinelIndividualImageDataset.std
         transform = SentinelIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
