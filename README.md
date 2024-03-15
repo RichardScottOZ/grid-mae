@@ -11,7 +11,7 @@
 - A few notes : https://github.com/RichardScottOZ/satmae_pp
 - LICENSE - Apache 2.0
 	- https://github.com/techmn/satmae_pp/blob/main/LICENSE
-
+	
 ### DATA
 - Trained on https://github.com/fMoW/dataset [70GB tarball] https://purl.stanford.edu/vg497cb6002
 	- To invesigate structure
@@ -79,4 +79,6 @@
 - Resolution groupings - this is a satmae parameter already
 
 	
-	
+### Xbatcher?
+- Might be fun to get an xarray based training loop going
+	- zen3geo: https://zen3geo.readthedocs.io/en/v0.2.0/chipping.html
