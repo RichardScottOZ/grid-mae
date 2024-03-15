@@ -62,8 +62,8 @@ def get_args_parser():
     parser.add_argument('--warmup_epochs', type=int, default=20, metavar='N', help='epochs to warmup LR')
 
     # Dataset parameters
-    parser.add_argument('--train_path', default='dataset/fmow_sentinel/train.csv', type=str, help='Train .csv path')
-    parser.add_argument('--dataset_type', default='sentinel', choices=['rgb', 'sentinel'],
+    parser.add_argument('--train_path', default='dataset/grid/train.csv', type=str, help='Train .csv path')
+    parser.add_argument('--dataset_type', default='sentinel', choices=['rgb', 'sentinel', 'grid'],
                         help='Whether to use fmow rgb, sentinel, or other dataset.')
     parser.add_argument('--masked_bands', type=int, nargs='+', default=None,
                         help='Sequence of band indices to mask (with mean val) in sentinel dataset')
