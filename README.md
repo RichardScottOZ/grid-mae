@@ -12,6 +12,7 @@
 	- To invesigate structure
 	- Presumably 3 band groupings for 10, 20 and 60m resolution patches around pictures of locations of interest - airports, zoos, etc.
 	- Designed to classify these
+- Metadata file - csv with location/polygon coordinates, class type etc.	
 	
 # Problem
 ## General
