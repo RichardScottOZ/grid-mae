@@ -31,5 +31,11 @@
 
 ### Padding
 - Planets, surface etc. - not rectangles
+
+### Data Loader
+- Likely want on the fly grid slicing into tiles, not directory structures full of sliced up grids in folders
+
+### Overlap training tiles
+- Is this useful for autoencoders here beyond smoothing reasons
 	
 	
