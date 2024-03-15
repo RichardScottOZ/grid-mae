@@ -8,11 +8,12 @@
 - A few notes : https://github.com/RichardScottOZ/satmae_pp
 
 ### DATA
-- Trained on https://github.com/fMoW/dataset
+- Trained on https://github.com/fMoW/dataset [70GB tarball]
 	- To invesigate structure
 	- Presumably 3 band groupings for 10, 20 and 60m resolution patches around pictures of locations of interest - airports, zoos, etc.
 	- Designed to classify these
 - Metadata file - csv with location/polygon coordinates, class type etc.	
+	- These are here https://raw.githubusercontent.com/fMoW/dataset/master/LICENSE
 	
 # Problem
 ## General
