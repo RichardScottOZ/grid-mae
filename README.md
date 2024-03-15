@@ -82,3 +82,5 @@
 ### Xbatcher?
 - Might be fun to get an xarray based training loop going
 	- zen3geo: https://zen3geo.readthedocs.io/en/v0.2.0/chipping.html
+	- https://earthmover.io/blog/cloud-native-dataloader
+	- https://xbatcher.readthedocs.io/en/latest/
