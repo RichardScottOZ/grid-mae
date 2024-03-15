@@ -255,7 +255,7 @@ class GridIndividualImageDataset(SatelliteDataset):
 
 ###################################################################################################################
 
-def build_grid_dataset(is_train: bool, args) -> SatelliteDataset:
+def build_grid_dataset(is_train: bool, args) -> GridDataset:
     """
     Initializes a SatelliteDataset object given provided args.
     :param is_train: Whether we want the dataset for training or evaluation
@@ -271,10 +271,10 @@ def build_grid_dataset(is_train: bool, args) -> SatelliteDataset:
         dataset = CustomDatasetFromImages(file_path, transform)
 
     elif args.dataset_type == 'grid':
-        mean = SentinelIndividualImageDataset.mean
-        std = SentinelIndividualImageDataset.std
-        transform = SentinelIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
-        dataset = SentinelIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands,
+        mean = GridIndividualImageDataset.mean
+        std = GridIndividualImageDataset.std
+        transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
+        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands,
                                                  dropped_bands=args.dropped_bands)
 
     else:
