@@ -6,6 +6,8 @@
 ## SATMAE
 - https://github.com/techmn/satmae_pp
 - A few notes : https://github.com/RichardScottOZ/satmae_pp
+- LICENSE - Apache 2.0
+	- https://github.com/techmn/satmae_pp/blob/main/LICENSE
 
 ### DATA
 - Trained on https://github.com/fMoW/dataset [70GB tarball]
