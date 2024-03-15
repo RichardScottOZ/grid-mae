@@ -22,5 +22,13 @@
 
 ### Loss functions	
 - might be continuous or one hot
+
+### Simple Example
+- To keep it in human finger space [and patch space]
+- Take a set of geophysics grids at 100m resolution
+- Take another set at 200m resolution
+
+### Padding
+- Planets, surface etc. - not rectangels
 	
 	
