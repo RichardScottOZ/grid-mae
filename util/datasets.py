@@ -104,7 +104,7 @@ class GridNormalize:
         return img
 
 
-class GridIndividualImageDataset(SatelliteDataset):
+class GridIndividualImageDataset(GridDataset):
     #need to change this to general    
     label_types = ['value', 'one-hot']
     mean = [1370.19151926, 1184.3824625 , 1120.77120066, 1136.26026392,
