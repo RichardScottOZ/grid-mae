@@ -34,7 +34,15 @@
 - pip install timm
 - pip install opencv-python
 - [so far]
-	
+
+### Environment
+- I had started with a python 3.10 and default installed the rest which gave timm 0.9.16 and an error
+
+- satmae advises
+	- python 3.8
+	- pytorch 1.10
+	- cuda 11.1
+	- timm 0.4.12
 	
 	
 # Problem
