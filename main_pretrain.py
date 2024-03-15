@@ -32,7 +32,7 @@ from engine_pretrain import train_one_epoch
 
 
 def get_args_parser():
-    parser = argparse.ArgumentParser('SatMAE++ pre-training', add_help=False)
+    parser = argparse.ArgumentParser('GridMAE pre-training', add_help=False)
     parser.add_argument('--batch_size', default=16, type=int,
                         help='Batch size per GPU (effective batch size is batch_size * accum_iter * # gpus')
     parser.add_argument('--epochs', default=200, type=int)
