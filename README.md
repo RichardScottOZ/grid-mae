@@ -13,7 +13,7 @@
 	- https://github.com/techmn/satmae_pp/blob/main/LICENSE
 
 ### DATA
-- Trained on https://github.com/fMoW/dataset [70GB tarball]
+- Trained on https://github.com/fMoW/dataset [70GB tarball] https://purl.stanford.edu/vg497cb6002
 	- To invesigate structure
 	- Presumably 3 band groupings for 10, 20 and 60m resolution patches around pictures of locations of interest - airports, zoos, etc.
 	- Designed to classify these
@@ -44,6 +44,9 @@
 	- cuda 11.1
 	- timm 0.4.12
 	
+### Running
+- rasterio.errors.RasterioIOError: '/dataset/fmow_sentinel/fmow-sentinel/train\parking_lot_or_garage/parking_lot_or_garage_927/parking_lot_or_garage_927_109.tif' does not exist in the file system, and is not recognized as a supported dataset name.
+
 	
 # Problem
 ## General
