@@ -1,4 +1,4 @@
-#any modifications after 20240316 are by Richard Scott
+# Any modifications after 20240316 are by Richard Scott
 # --------------------------------------------------------
 # References:
 # MAE: https://github.com/facebookresearch/mae
@@ -18,7 +18,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.tensorboard import SummaryWriter
 
 import timm
-assert timm.__version__ >= "0.3.2"  # version check  #0.4.12 used here
+assert timm.__version__ >= "0.3.2"  # version check  #0.4.12 used here as per satmae repo
 import timm.optim.optim_factory as optim_factory
 
 import util.misc as misc
@@ -63,7 +63,7 @@ def get_args_parser():
 
     # Dataset parameters
     parser.add_argument('--train_path', default='dataset/grid/train.csv', type=str, help='Train .csv path')
-    parser.add_argument('--dataset_type', default='sentinel', choices=['rgb', 'sentinel', 'grid'],
+    parser.add_argument('--dataset_type', default='grid', choices=['rgb', 'sentinel', 'grid'],
                         help='Whether to use fmow rgb, sentinel, or other dataset.')
     parser.add_argument('--masked_bands', type=int, nargs='+', default=None,
                         help='Sequence of band indices to mask (with mean val) in sentinel dataset')
