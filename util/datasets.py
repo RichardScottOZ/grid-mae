@@ -107,12 +107,14 @@ class GridNormalize:
 class GridIndividualImageDataset(GridDataset):
     #need to change this to general    
     label_types = ['value', 'one-hot']
-    mean = [1370.19151926, 1184.3824625 , 1120.77120066, 1136.26026392,
-            1263.73947144, 1645.40315151, 1846.87040806, 1762.59530783,
-            1972.62420416,  582.72633433,   14.77112979, 1732.16362238, 1247.91870117]
-    std = [633.15169573,  650.2842772 ,  712.12507725,  965.23119807,
-           948.9819932 , 1108.06650639, 1258.36394548, 1233.1492281 ,
-           1364.38688993,  472.37967789,   14.3114637 , 1310.36996126, 1087.6020813]
+    mean = []
+    std = []
+    #mean = [1370.19151926, 1184.3824625 , 1120.77120066, 1136.26026392,
+            #1263.73947144, 1645.40315151, 1846.87040806, 1762.59530783,
+            #1972.62420416,  582.72633433,   14.77112979, 1732.16362238, 1247.91870117]
+    #std = [633.15169573,  650.2842772 ,  712.12507725,  965.23119807,
+           #948.9819932 , 1108.06650639, 1258.36394548, 1233.1492281 ,
+           #1364.38688993,  472.37967789,   14.3114637 , 1310.36996126, 1087.6020813]
 
     def __init__(self,
                  csv_path: str,
@@ -183,6 +185,7 @@ class GridIndividualImageDataset(GridDataset):
         for index, row in df_grid.iterrows():
             print("stats for:",row['category'])
             with rasterio.open('dataset/grid/grid/' + row['category'] + '.tif') as src:
+                print(src.meta)
                 data = src.read(1, masked=True)
                 self.mean.append(np.nanmean(data))
                 self.std.append(np.std(data))
