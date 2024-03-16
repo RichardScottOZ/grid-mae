@@ -15,6 +15,9 @@
 - LICENSE - Apache 2.0
 	- https://github.com/techmn/satmae_pp/blob/main/LICENSE
 	
+### HARDWARE
+- V100s - 16GB?
+
 ### DATA
 - Trained on https://github.com/fMoW/dataset [70GB tarball] https://purl.stanford.edu/vg497cb6002
 	- To invesigate structure
@@ -28,7 +31,7 @@
 	category	location_id	image_id	timestamp	polygon
 0	airport	0	6	2015-07-25T08:45:14Z	POLYGON ((32.666164117900003 39.932541952376475, 32.711078120537337 39.932541952376475, 32.711078120537337 39.967113357199999, 32.666164117900003 39.967113357199999, 32.666164117900003 39.932541952376475))
 
-### Instllation
+### Installation
 - pytorch as pre instructions
 	- https://pytorch.org/get-started/locally/
 - geopandas to get bonus gdal
