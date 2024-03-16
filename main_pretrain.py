@@ -88,7 +88,7 @@ def get_args_parser():
     # distributed training parameters
     parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')
     parser.add_argument('--local_rank', default=os.getenv('LOCAL_RANK', 0), type=int)  # prev default was -1
-    parser.add_argument('--dist_on_itp', action='store_true')
+    #parser.add_argument('--dist_on_itp', action='store_true')  #don't need distributed for test
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
 
     return parser
@@ -139,7 +139,7 @@ def main(args):
     # define the model
     if args.model_type == 'group_c':
         # Workaround because action append will add to default list
-        if len(args.grouped_bands) == 0:
+        if len(args.grouped_bands) == 0:  #need to handle
             args.grouped_bands = [[0, 1, 2, 6], [3, 4, 5, 7], [8, 9]]
 
         print(f"Grouping bands {args.grouped_bands}")
