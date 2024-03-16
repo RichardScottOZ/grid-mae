@@ -263,6 +263,8 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
     :return: SatelliteDataset object.
     """
     file_path = os.path.join(args.train_path if is_train else args.test_path)
+    
+    print("Train Path:",file_path)
 
 
     if args.dataset_type == 'grid':
