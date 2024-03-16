@@ -201,6 +201,7 @@ class GridIndividualImageDataset(GridDataset):
                 srcData['max'] = np.nanmax(data)
                 srcData['range'] = np.nanmax(data)
                 srcData['scale'] = 1.0/(srcData['max'] - srcData['min'] )
+                srcData['data'] = data
                 
         print(self.srcMeta)
         
