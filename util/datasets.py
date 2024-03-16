@@ -181,13 +181,28 @@ class GridIndividualImageDataset(GridDataset):
         self.mean = []
         self.std = []
         
+        self.srcMeta = []
+        
+        
         for index, row in df_grid.iterrows():
             print("stats for:",row['category'])
+            self.srcMeta.append({"name":row['category'], "loss":"mse"})
+
+        for srcData in self.srcMeta:
             with rasterio.open('dataset/grid/grid/' + row['category'] + '.tif') as src:
                 print(src.meta)
                 data = src.read(1, masked=True)
                 self.mean.append(np.nanmean(data))
                 self.std.append(np.nanstd(data))
+                
+                srcData['mean'] = self.mean
+                srcData['std'] = self.std
+                srcData['min'] = np.nanmin(data)
+                srcData['max'] = np.nanmax(data)
+                srcData['range'] = np.nanmax(data)
+                srcData['scale'] = 1.0/(srcData['max'] - srcData['min'] )
+                
+        print(self.srcMeta)
         
 
     def __len__(self):
