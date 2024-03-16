@@ -44,7 +44,7 @@ def get_args_parser():
     parser.add_argument('--model', default='mae_vit_base_patch16', type=str, metavar='MODEL', help='Name of model to train')
     parser.add_argument('--input_size', default=96, type=int, help='images input size')
     parser.add_argument('--patch_size', default=8, type=int, help='patch embedding patch size')
-    parser.add_argument('--mask_ratio', default=0.75, type=float,aws 
+    parser.add_argument('--mask_ratio', default=0.75, type=float, 
                         help='Masking ratio (percentage of removed patches).')
     parser.add_argument('--spatial_mask', action='store_true', default=False,
                         help='Whether to mask all channels of a spatial location. Only for indp c model')
