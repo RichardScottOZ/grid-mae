@@ -187,7 +187,7 @@ class GridIndividualImageDataset(GridDataset):
                 print(src.meta)
                 data = src.read(1, masked=True)
                 self.mean.append(np.nanmean(data))
-                self.std.append(np.std(data))
+                self.std.append(np.nanstd(data))
         
 
     def __len__(self):
