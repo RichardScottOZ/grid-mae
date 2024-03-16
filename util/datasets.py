@@ -264,13 +264,8 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
     """
     file_path = os.path.join(args.train_path if is_train else args.test_path)
 
-    if args.dataset_type == 'rgb':
-        mean = CustomDatasetFromImages.mean
-        std = CustomDatasetFromImages.std
-        transform = CustomDatasetFromImages.build_transform(is_train, args.input_size*2, mean, std)
-        dataset = CustomDatasetFromImages(file_path, transform)
 
-    elif args.dataset_type == 'grid':
+    if args.dataset_type == 'grid':
         mean = GridIndividualImageDataset.mean
         std = GridIndividualImageDataset.std
         transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
