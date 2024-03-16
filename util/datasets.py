@@ -176,8 +176,7 @@ class GridIndividualImageDataset(GridDataset):
             self.in_c = self.in_c - len(dropped_bands)
             
         df_grid = pd.read_csv(self.csv_path)
-        #print(df_grid)
-        #print(os.getcwd())
+
         grid_dict = {}
         self.mean = []
         self.std = []
