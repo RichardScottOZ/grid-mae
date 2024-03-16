@@ -63,6 +63,7 @@
 
 ### Loss functions	
 - might be continuous or one hot
+- assume mse default for testing this and getting to work
 
 ### Simple Example
 - To keep it in human finger space [and patch space]
@@ -90,5 +91,11 @@
 	- zen3geo: https://zen3geo.readthedocs.io/en/v0.2.0/chipping.html
 	- https://earthmover.io/blog/cloud-native-dataloader
 	- https://xbatcher.readthedocs.io/en/latest/
+	
+	
+### Data Sources
+- Assume all files the same
+- Read from a data directory
+- Stack	
 	
 	
