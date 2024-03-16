@@ -203,10 +203,12 @@ class GridIndividualImageDataset(GridDataset):
                 srcData['scale'] = 1.0/(srcData['max'] - srcData['min'] )
                 srcData['data'] = data
                 
-        print(self.srcMeta)
+        #print(self.srcMeta)
+        self.usefulData = srcData['data'] != np.nan
         
 
     def __len__(self):
+        # this is the number of tiles
         return len(self.df)
 
     def open_image(self, img_path):
