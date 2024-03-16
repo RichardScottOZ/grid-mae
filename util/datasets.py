@@ -227,7 +227,7 @@ class GridIndividualImageDataset(GridDataset):
 
         t = []
         if is_train:
-            t.append(SentinelNormalize(mean, std))  # use specific Sentinel normalization to avoid NaN
+            t.append(GridNormalize(mean, std))  # use specific Sentinel normalization to avoid NaN
             t.append(transforms.ToTensor())
             t.append(
                 transforms.RandomResizedCrop(input_size, scale=(0.6, 1.0), interpolation=interpol_mode),  # 3 is bicubic
@@ -271,8 +271,7 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
         mean = GridIndividualImageDataset.mean
         std = GridIndividualImageDataset.std
         transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
-        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands,
-                                                 dropped_bands=args.dropped_bands)
+        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands)
 
     else:
         raise ValueError(f"Invalid dataset type: {args.dataset_type}")
