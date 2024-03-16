@@ -22,7 +22,7 @@ assert timm.__version__ >= "0.3.2"  # version check  #0.4.12 used here as per sa
 import timm.optim.optim_factory as optim_factory
 
 import util.misc as misc
-from util.datasets import build_fmow_dataset
+from util.datasets import build_grid_dataset
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
 import models_mae
