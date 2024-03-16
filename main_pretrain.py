@@ -88,7 +88,7 @@ def get_args_parser():
     # distributed training parameters
     parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')
     parser.add_argument('--local_rank', default=os.getenv('LOCAL_RANK', 0), type=int)  # prev default was -1
-    #parser.add_argument('--dist_on_itp', action='store_true')  #don't need distributed for test
+    parser.add_argument('--dist_on_itp', action='store_true')  #don't need distributed for test
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
 
     return parser
