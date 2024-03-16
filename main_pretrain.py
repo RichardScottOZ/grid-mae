@@ -44,7 +44,7 @@ def get_args_parser():
     parser.add_argument('--model', default='mae_vit_base_patch16', type=str, metavar='MODEL', help='Name of model to train')
     parser.add_argument('--input_size', default=96, type=int, help='images input size')
     parser.add_argument('--patch_size', default=8, type=int, help='patch embedding patch size')
-    parser.add_argument('--mask_ratio', default=0.75, type=float,
+    parser.add_argument('--mask_ratio', default=0.75, type=float,aws 
                         help='Masking ratio (percentage of removed patches).')
     parser.add_argument('--spatial_mask', action='store_true', default=False,
                         help='Whether to mask all channels of a spatial location. Only for indp c model')
@@ -95,7 +95,7 @@ def get_args_parser():
 
 
 def main(args):
-    misc.init_distributed_mode(args)
+    misc.init_distributed_mode(args)  #this should fall through to none
 
     print('job dir: {}'.format(os.path.dirname(os.path.realpath(__file__))))
     print("{}".format(args).replace(', ', ',\n'))
@@ -109,8 +109,10 @@ def main(args):
 
     cudnn.benchmark = True
 
-    dataset_train = build_fmow_dataset(is_train=True, args=args)
+    dataset_train = build_grid_dataset(is_train=True, args=args)
     print(dataset_train)
+    
+    return
 
     if True:  # args.distributed:
         num_tasks = misc.get_world_size()
