@@ -172,6 +172,21 @@ class GridIndividualImageDataset(GridDataset):
         self.dropped_bands = dropped_bands
         if self.dropped_bands is not None:
             self.in_c = self.in_c - len(dropped_bands)
+            
+        df_grid = pd.read_csv(self.csv_path)
+        #print(df_grid)
+        #print(os.getcwd())
+        grid_dict = {}
+        self.mean = []
+        self.std = []
+        
+        for index, row in df_grid.iterrows():
+            print("stats for:",row['category'])
+            with rasterio.open('dataset/grid/grid/' + row['category'] + '.tif') as src:
+                data = src.read(1, masked=True)
+                self.mean.append(np.nanmean(data))
+                self.std.append(np.std(data))
+        
 
     def __len__(self):
         return len(self.df)
@@ -275,6 +290,6 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
 
     else:
         raise ValueError(f"Invalid dataset type: {args.dataset_type}")
-    print(dataset)
+    print(dataset.mean, dataset.std)
 
     return dataset
