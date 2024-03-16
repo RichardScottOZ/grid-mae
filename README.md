@@ -97,5 +97,22 @@
 - Assume all files the same
 - Read from a data directory
 - Stack	
+
+### test type runs
+
+python -m main_pretrain.py \
+--batch_size 8 --accum_iter 16 \
+--epochs 1 --warmup_epochs 1 \
+--input_size 96 --patch_size 8 \
+--mask_ratio 0.75 \
+--model_type group_c \
+--dataset_type grid \
+--grouped_bands 0 --grouped_bands 1 \
+--blr 0.0001 --num_workers 8 \
+--output_dir ./output_dir \
+--log_dir ./output_dir
+
+- python -m main_pretrain.py --batch_size 8 --accum_iter 16 --epochs 3 --warmup_epochs 1 --input_size 96 --patch_size 8 --mask_ratio 0.75 --model_type group_c --dataset_type grid --grouped_bands 0 --grouped_bands 1 --blr 0.0001 --num_workers 8  --output_dir ./output_dir --log_dir ./output_dir
+
 	
 	
