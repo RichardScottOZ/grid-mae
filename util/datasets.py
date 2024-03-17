@@ -261,6 +261,7 @@ class GridIndividualImageDataset(GridDataset):
         for src in self.srcMeta:
             #if put onehot or others in would need to expand this
             if src["loss"] != 'mse':
+                #TODO
                 print("NEED TO FIX - add an error after")
             else:
                 batchDimension +=1
@@ -402,23 +403,57 @@ class GridIndividualImageDataset(GridDataset):
         #img_as_tensor = self.transform(batch[idx])  # (c, h, w)
         img_as_tensor = self.transform(batch[0])  # (c, h, w)
 
+        #print("IMG_AS_TENSOR.shape",img_as_tensor.shape)
+
+        if 1 == 1:
+            #print("BATCH 0 SHAPE:",batch[0].shape)
+            #print("BATCH SHAPE BEFORE:",batch.shape)
+            batch_p = batch.transpose(0,3,1,2)
+            #print("BATCH P SHAPE:",batch_p.shape)
+            #print("BATCH SHAPE AFTER:",batch.shape)
 
         if self.dropped_bands is not None:
             keep_idxs = [i for i in range(img_as_tensor.shape[0]) if i not in self.dropped_bands]
             img_as_tensor = img_as_tensor[keep_idxs, :, :]
 
-            
         img_dn_2x = F.interpolate(img_as_tensor.unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
         img_dn_4x = F.interpolate(img_dn_2x.unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
 
+        #print("IMG_DN_2x.shape",img_dn_2x.shape)
+        #print("IMG_DN_4x.shape",img_dn_4x.shape)
+
+        if 1 == 1:
+            batch_p = np.empty((batch.shape[0],img_as_tensor.shape[0],img_as_tensor.shape[1],img_as_tensor.shape[2]))
+            batch_p_2x = np.empty((batch_p.shape[0],img_dn_2x.shape[0],img_dn_2x.shape[1],img_dn_2x.shape[2]))
+            batch_p_4x = np.empty((batch_p.shape[0],img_dn_4x.shape[0],img_dn_4x.shape[1],img_dn_4x.shape[2]))
+
+            batch_p = torch.tensor(batch_p)
+            batch_p_2x = torch.tensor(batch_p_2x)
+            batch_p_4x = torch.tensor(batch_p_4x)
+
+            for b in range(batch_p.shape[0]):
+                #print("B:",b)
+                #print("B TRANSFORM SHAPE:",self.transform(batch[b]).shape )
+                #print("BATCH P[0] SHAPE:",batch_p[b].shape)
+                #print("BATCH B[0] SHAPE:",batch[b].shape)
+                batch_p[b] = self.transform(batch[b])
+
+            for b in range(batch_p_2x.shape[0]):
+                batch_p_2x[b] = F.interpolate(batch_p[b].unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
+                #for b in range(batch_p_4x.shape[0]):
+                batch_p_4x[b] = F.interpolate(batch_p_2x[b].unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
+
+
         #return {'img_up_4x':img_as_tensor, 'img_up_2x':img_dn_2x, 'img':img_dn_4x, 'label':labels}
+        #4N = 96, 2N = 192, base = 384 etc.
         return {'img_up_4x':img_as_tensor, 'img_up_2x':img_dn_2x, 'img':img_dn_4x}
+        #return {'img_up_4x':batch_p, 'img_up_2x':batch_p_2x, 'img':batch_p_4x}
 
     @staticmethod
     def build_transform(is_train, input_size, mean, std):
         # train transform
         interpol_mode = transforms.InterpolationMode.BICUBIC
-
+        print("FIRST GRIDNORM:",len(mean),len(std))
         t = []
         if is_train:
             t.append(GridNormalize(mean, std))  # use specific Sentinel normalization to avoid NaN
@@ -436,6 +471,7 @@ class GridIndividualImageDataset(GridDataset):
             crop_pct = 1.0
         size = int(input_size / crop_pct)
 
+        print("SECOND GRIDNORM:",len(mean),len(std))
         t.append(GridNormalize(mean, std))
         t.append(transforms.ToTensor())
         t.append(
@@ -451,10 +487,10 @@ class GridIndividualImageDataset(GridDataset):
 
 def build_grid_dataset(is_train: bool, args) -> GridDataset:
     """
-    Initializes a SatelliteDataset object given provided args.
+    Initializes a GridDataset object given provided args.
     :param is_train: Whether we want the dataset for training or evaluation
     :param args: Argparser args object with provided arguments
-    :return: SatelliteDataset object.
+    :return: GridDataset object.
     """
     file_path = os.path.join(args.train_path if is_train else args.test_path)
     
@@ -470,7 +506,7 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
 
         rasters, mask = getRasterLayers(args.train_path)
 
-        print(rasters)
+        #print(rasters)
 
         mean = []
         std = []
@@ -490,6 +526,6 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
 
     else:
         raise ValueError(f"Invalid dataset type: {args.dataset_type}")
-    print(dataset.mean, dataset.std)
+    print("STATS:",dataset.mean, dataset.std)
 
     return dataset
