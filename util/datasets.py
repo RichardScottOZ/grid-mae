@@ -268,6 +268,10 @@ class GridIndividualImageDataset(GridDataset):
             batch[:,:,countloss] = (data-src["min"])*src["scale"]
             countloss += 1    
 
+    def allocate(self):
+        batch = np.empty( (self.batch_size, self.batch_height, self.batch_width), dtype=np.float32 )
+        return batch
+
     def __len__(self):
         # this is the number of tiles
         return len(self.df)
