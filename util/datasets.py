@@ -248,8 +248,8 @@ class GridIndividualImageDataset(GridDataset):
         self.width = self.usefulData.shape[1]
         
         perEpoch = int((self.usefulData[::self.batch_height,::self.batch_width]>0).sum())
-        self.batch_count = perEpoch // batch_size
-        self.perEpoch = self.batch_count * batch_size        
+        self.batch_count = perEpoch // self.batch_size
+        self.perEpoch = self.batch_count * self.batch_size        
         
     def fill(self, batch):
         while True:
