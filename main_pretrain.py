@@ -42,6 +42,7 @@ def get_args_parser():
     # Model parameters
     parser.add_argument('--model_type', default='group_c', choices=['group_c', 'vanilla'], help='Use channel model')
     parser.add_argument('--model', default='mae_vit_base_patch16', type=str, metavar='MODEL', help='Name of model to train')
+    parser.add_argument('--input_channels', default=2, type=int, help='number of different grids')
     parser.add_argument('--input_size', default=96, type=int, help='images input size')
     parser.add_argument('--patch_size', default=8, type=int, help='patch embedding patch size')
     parser.add_argument('--mask_ratio', default=0.75, type=float, 
@@ -110,9 +111,10 @@ def main(args):
     cudnn.benchmark = True
 
     dataset_train = build_grid_dataset(is_train=True, args=args)
-    print(dataset_train)
-    
-    return
+    #print(dataset_train)
+    #print(dataset_train.srcMeta)
+        
+    #return
 
     if True:  # args.distributed:
         num_tasks = misc.get_world_size()
@@ -142,7 +144,7 @@ def main(args):
     if args.model_type == 'group_c':
         # Workaround because action append will add to default list
         if len(args.grouped_bands) == 0:  #need to handle
-            args.grouped_bands = [[0, 1, 2, 6], [3, 4, 5, 7], [8, 9]]
+            args.grouped_bands = [[0, 1, 2, 6], [3, 4, 5, 7], [8, 9]]  ##sentinel 2 default with 3 dropped bands
 
         print(f"Grouping bands {args.grouped_bands}")
         model = models_mae_group_channels.__dict__[args.model](img_size=args.input_size,
