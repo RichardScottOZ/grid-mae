@@ -244,11 +244,21 @@ class GridIndividualImageDataset(GridDataset):
                 
         #print(self.srcMeta)
         self.usefulData = srcData['data'] != np.nan
-        self.height = self.useData.shape[0]
-        self.width = self.useData.shape[1]
+        self.height = self.usefulData.shape[0]
+        self.width = self.usefulData.shape[1]
         
+        perEpoch = int((self.usefulData[::batch_height,::batch_width]>0).sum())
+        self.batch_count = perEpoch // batch_size
+        self.perEpoch = self.batch_count * batch_size        
         
-
+    def fill(self, batch):
+        while True:
+            xRest = np.random.randint(self.width - self.batch_width) #range to get sample from
+            yRest = np.random.randint(self.height - self.batch_height) #range to get sample from
+            if self.usefulData[yRest+(self.batch_height>>1), xRest+(self.batch_width >> 1)]:
+                break
+        
+    
     def __len__(self):
         # this is the number of tiles
         return len(self.df)
