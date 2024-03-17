@@ -279,10 +279,35 @@ class GridIndividualImageDataset(GridDataset):
             batch[:,:,countloss] = (data-src["min"])*src["scale"]
             countloss += 1    
 
-    def allocate(self):
+    def allocate_batch(self):
         # need something for inference eventually
         batch = np.empty( (self.batch_size, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
         return batch
+        
+    def get_tile(self, xRest, yRest, batch):
+        batch[:] = 0
+        xBatch = min(xRest + self.batch_width,self.width)
+        yBatch = min(yRest + self.batch_height,self.height)        
+        batch_xStart = 0
+        batch_yStart = 0
+        if xRest<0:
+            batch_xStart = -xRest
+            xRest = 0
+        if yRest<0:
+            batch_yStart = -yRest
+            yRest = 0
+            
+        channels = 0
+        for src in self.srcMeta:
+            data = src["data"][y0:y1, x0:x1]
+            loss = src["loss"]
+            if loss != 'mse':
+                #TODO
+                print("WRONG!")
+            elif loss=='mse':
+                batch[batch_yStart:batch_yStart+yBatch-yRest, batch_xStart:batch_xStart+xBatch-xRest, channels] = (data-src["min"])*src["scale"]
+                channels += 1
+        return batch    
     
     def get_tile_batch(self, xRest, yRest):
         batch = np.empty( (self.batch_height, self.batch_width, self.batchDimension ), dtype=np.float32 )
@@ -290,7 +315,7 @@ class GridIndividualImageDataset(GridDataset):
         return batch
 
     def __len__(self):
-        # this is the number of tiles
+        # TODO this is the number of tiles/batches/data as required 
         return len(self.df)
 
     def open_image(self, img_path):
