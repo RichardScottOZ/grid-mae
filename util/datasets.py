@@ -246,6 +246,17 @@ class GridIndividualImageDataset(GridDataset):
         self.usefulData = srcData['data'] != np.nan
         self.height = self.usefulData.shape[0]
         self.width = self.usefulData.shape[1]
+
+        batchDimension = 0
+        for src in srcMeta:
+            #if put onehot or others in would need to expand this
+            if src["loss"] != 'mse':
+                print("NEED TO FIX - add an error after")
+            else:
+                batchDimension +- 1
+        
+        self.batchDimension = batchDimension
+                
         
         perEpoch = int((self.usefulData[::self.batch_height,::self.batch_width]>0).sum())
         self.batch_count = perEpoch // self.batch_size
@@ -269,7 +280,13 @@ class GridIndividualImageDataset(GridDataset):
             countloss += 1    
 
     def allocate(self):
-        batch = np.empty( (self.batch_size, self.batch_height, self.batch_width), dtype=np.float32 )
+        # need something for inference eventually
+        batch = np.empty( (self.batch_size, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
+        return batch
+    
+    def get_tile_batch(self, xRest, yRest):
+        batch = np.empty( (self.batch_height, self.batch_width, self.batchDimension ), dtype=np.float32 )
+        self.get_tile(xRest,yRest,batch)
         return batch
 
     def __len__(self):
