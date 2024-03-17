@@ -309,6 +309,15 @@ class GridIndividualImageDataset(GridDataset):
                 channels += 1
         return batch    
     
+    def get_sample(self):
+        batch = np.empty( (self.batch_size, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
+        self.fill(batch)
+        return batch
+    
+    def get_input_shape(self):
+        # could be useful
+        return (self.batch_height, self.batch_width, self.batchDimension)
+        
     def get_tile_batch(self, xRest, yRest):
         batch = np.empty( (self.batch_height, self.batch_width, self.batchDimension ), dtype=np.float32 )
         self.get_tile(xRest,yRest,batch)
@@ -316,7 +325,8 @@ class GridIndividualImageDataset(GridDataset):
 
     def __len__(self):
         # TODO this is the number of tiles/batches/data as required 
-        return len(self.df)
+        #return len(self.df)
+        return self.batch_count
 
     def open_image(self, img_path):
         with rasterio.open(img_path) as data:
