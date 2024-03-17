@@ -254,7 +254,7 @@ class GridIndividualImageDataset(GridDataset):
             if src["loss"] != 'mse':
                 print("NEED TO FIX - add an error after")
             else:
-                batchDimension +- 1
+                batchDimension +=1
         
         self.batchDimension = batchDimension
                 
@@ -339,6 +339,7 @@ class GridIndividualImageDataset(GridDataset):
         self.cursor += 1
         
         batch = np.empty( (self.batch_size, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
+        print("NEXT BATCH SHAPE:",batch.shape)
         for i in range(self.batch_size):
             self.fill(batch[i])
         return batch    
