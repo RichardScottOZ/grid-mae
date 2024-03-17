@@ -340,7 +340,8 @@ class GridIndividualImageDataset(GridDataset):
     def __len__(self):
         # TODO this is the number of tiles/batches/data as required 
         #return len(self.df)
-        return self.batch_count
+        #return self.batch_count
+        return self.perEpoch
     
     def __iter__(self):
         self.cursor = 0
