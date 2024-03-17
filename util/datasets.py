@@ -41,7 +41,7 @@ def getRasterLayers(csv_path):
         srcMeta.append({"name":row['category'], "loss":"mse"})
 
     for srcData in srcMeta:
-        with rasterio.open('dataset/grid/grid/' + row['category'] + '.tif') as src:
+        with rasterio.open('dataset/grid/grid/' + srcData['name'] + '.tif') as src:
             print(src.meta)
             data = src.read(1, masked=True)
             mean.append(np.nanmean(data))
@@ -132,8 +132,8 @@ class GridNormalize:
         self.std = np.array(std)
 
     def __call__(self, x, *args, **kwargs):
-        print("GNMEAN:",self.mean)
-        print("GNSTD:",self.std)
+        #print("GNMEAN:",self.mean)
+        #print("GNSTD:",self.std)
 
         min_value = self.mean - 2 * self.std
         max_value = self.mean + 2 * self.std
@@ -406,7 +406,8 @@ class GridIndividualImageDataset(GridDataset):
         img_dn_2x = F.interpolate(img_as_tensor.unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
         img_dn_4x = F.interpolate(img_dn_2x.unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
 
-        return {'img_up_4x':img_as_tensor, 'img_up_2x':img_dn_2x, 'img':img_dn_4x, 'label':labels}
+        #return {'img_up_4x':img_as_tensor, 'img_up_2x':img_dn_2x, 'img':img_dn_4x, 'label':labels}
+        return {'img_up_4x':img_as_tensor, 'img_up_2x':img_dn_2x, 'img':img_dn_4x}
 
     @staticmethod
     def build_transform(is_train, input_size, mean, std):
