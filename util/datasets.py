@@ -175,6 +175,8 @@ class GridIndividualImageDataset(GridDataset):
         self.base_path = '/'
         
         self.batch_size = batch_size
+        self.batch_width = 224
+        self.batch_height = 224  #hardcode a default start for now
 
         # extract base folder path from csv file path
         path_tokens = csv_path.split('/')
@@ -242,6 +244,9 @@ class GridIndividualImageDataset(GridDataset):
                 
         #print(self.srcMeta)
         self.usefulData = srcData['data'] != np.nan
+        self.height = self.useData.shape[0]
+        self.width = self.useData.shape[1]
+        
         
 
     def __len__(self):
