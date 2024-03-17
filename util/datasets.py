@@ -104,6 +104,41 @@ class GridNormalize:
         return img
 
 
+def getRasterLayers(csv_path):
+    df_grid = pd.read_csv(self.csv_path)
+
+    grid_dict = {}
+    self.mean = []
+    self.std = []
+    
+    srcMeta = []
+    
+    
+    for index, row in df_grid.iterrows():
+        print("stats for:",row['category'])
+        srcMeta.append({"name":row['category'], "loss":"mse"})
+
+    for srcData in self.srcMeta:
+        with rasterio.open('dataset/grid/grid/' + row['category'] + '.tif') as src:
+            print(src.meta)
+            data = src.read(1, masked=True)
+            self.mean.append(np.nanmean(data))
+            self.std.append(np.nanstd(data))
+            
+            srcData['mean'] = self.mean
+            srcData['std'] = self.std
+            srcData['min'] = np.nanmin(data)
+            srcData['max'] = np.nanmax(data)
+            srcData['range'] = np.nanmax(data)
+            srcData['scale'] = 1.0/(srcData['max'] - srcData['min'] )
+            srcData['data'] = data
+            
+    #print(self.srcMeta)
+    usefulData = srcData['data'] != np.nan
+    
+    return srcMeta, usefulData
+
+
 class GridIndividualImageDataset(GridDataset):
     #need to change this to general    
     label_types = ['value', 'one-hot']
