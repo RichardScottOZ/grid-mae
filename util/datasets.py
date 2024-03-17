@@ -163,7 +163,8 @@ class GridIndividualImageDataset(GridDataset):
                  label_type: str = 'value',
                  masked_bands: Optional[List[int]] = None,
                  dropped_bands = [0, 9, 10],
-                 batch_size = None):
+                 batch_size = None,
+                 input_channels = None):
         """
         Creates dataset for multi-spectral single image classification.
         Usually used for fMoW-Sentinel dataset.
@@ -175,7 +176,8 @@ class GridIndividualImageDataset(GridDataset):
         :param masked_bands: List of indices corresponding to which bands to mask out
         :param dropped_bands:  List of indices corresponding to which bands to drop from input image tensor
         """
-        super().__init__(in_c=13)
+        #super().__init__(in_c=13)
+        super().__init__(in_c=input_channels)
         self.csv_path = csv_path
         self.base_path = '/'
         
@@ -480,7 +482,7 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
 
         transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
         #transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, np.asarray(mean), np.asarray(std)) # input_size*2 = 96*2 = 192
-        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands, batch_size=args.batch_size)
+        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands, batch_size=args.batch_size, input_channels=args.input_channels)
 
         #mean = GridIndividualImageDataset.mean
         #std = GridIndividualImageDataset.std
