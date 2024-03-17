@@ -27,6 +27,41 @@ warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 
 CATEGORIES = ["gravity", "magnetics"]
 
+def getRasterLayers(csv_path):
+    df_grid = pd.read_csv(csv_path)
+
+    grid_dict = {}
+    mean = []
+    std = []
+    
+    srcMeta = []
+    
+    for index, row in df_grid.iterrows():
+        print("stats for:",row['category'])
+        srcMeta.append({"name":row['category'], "loss":"mse"})
+
+    for srcData in srcMeta:
+        with rasterio.open('dataset/grid/grid/' + row['category'] + '.tif') as src:
+            print(src.meta)
+            data = src.read(1, masked=True)
+            mean.append(np.nanmean(data))
+            std.append(np.nanstd(data))
+            
+            srcData['mean'] = mean
+            srcData['std'] = std
+            srcData['min'] = np.nanmin(data)
+            srcData['max'] = np.nanmax(data)
+            srcData['range'] = np.nanmax(data)
+            srcData['scale'] = 1.0/(srcData['max'] - srcData['min'] )
+            srcData['data'] = data
+            
+    #print(self.srcMeta)
+    usefulData = srcData['data'] != np.nan
+    
+    return srcMeta, usefulData
+
+
+
 
 class GridDataset(Dataset):
     """
@@ -97,45 +132,15 @@ class GridNormalize:
         self.std = np.array(std)
 
     def __call__(self, x, *args, **kwargs):
+        print("GNMEAN:",self.mean)
+        print("GNSTD:",self.std)
+
         min_value = self.mean - 2 * self.std
         max_value = self.mean + 2 * self.std
         img = (x - min_value) / (max_value - min_value) * 255.0
         img = np.clip(img, 0, 255).astype(np.uint8)
         return img
 
-
-def getRasterLayers(csv_path):
-    df_grid = pd.read_csv(self.csv_path)
-
-    grid_dict = {}
-    self.mean = []
-    self.std = []
-    
-    srcMeta = []
-    
-    for index, row in df_grid.iterrows():
-        print("stats for:",row['category'])
-        srcMeta.append({"name":row['category'], "loss":"mse"})
-
-    for srcData in self.srcMeta:
-        with rasterio.open('dataset/grid/grid/' + row['category'] + '.tif') as src:
-            print(src.meta)
-            data = src.read(1, masked=True)
-            self.mean.append(np.nanmean(data))
-            self.std.append(np.nanstd(data))
-            
-            srcData['mean'] = self.mean
-            srcData['std'] = self.std
-            srcData['min'] = np.nanmin(data)
-            srcData['max'] = np.nanmax(data)
-            srcData['range'] = np.nanmax(data)
-            srcData['scale'] = 1.0/(srcData['max'] - srcData['min'] )
-            srcData['data'] = data
-            
-    #print(self.srcMeta)
-    usefulData = srcData['data'] != np.nan
-    
-    return srcMeta, usefulData
 
 
 class GridIndividualImageDataset(GridDataset):
@@ -339,7 +344,7 @@ class GridIndividualImageDataset(GridDataset):
         self.cursor += 1
         
         batch = np.empty( (self.batch_size, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
-        print("NEXT BATCH SHAPE:",batch.shape)
+        #print("NEXT BATCH SHAPE:",batch.shape)
         for i in range(self.batch_size):
             self.fill(batch[i])
         return batch    
@@ -389,7 +394,8 @@ class GridIndividualImageDataset(GridDataset):
         #np.transpose(data,(0,3,1,2))    
             
         #for index, images in enumerate(batch):
-        img_as_tensor = self.transform(batch[idx])  # (c, h, w)
+        #img_as_tensor = self.transform(batch[idx])  # (c, h, w)
+        img_as_tensor = self.transform(batch[0])  # (c, h, w)
 
 
         if self.dropped_bands is not None:
@@ -449,13 +455,21 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
     print(args)
     print("Train Path:",file_path)
 
+    transform = None
+    mean = None
+    std = None
 
     if args.dataset_type == 'grid':
+        print(args.batch_size)
+
+        transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
+        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands, batch_size=args.batch_size)
+
+        
+
         mean = GridIndividualImageDataset.mean
         std = GridIndividualImageDataset.std
-        transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
-        print(args.batch_size)
-        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands, batch_size=args.batch_size)
+        print("buildgridmean:",mean)
 
     else:
         raise ValueError(f"Invalid dataset type: {args.dataset_type}")
