@@ -180,8 +180,10 @@ class GridIndividualImageDataset(GridDataset):
         self.base_path = '/'
         
         self.batch_size = batch_size
-        self.batch_width = 224
-        self.batch_height = 224  #hardcode a default start for now
+        #self.batch_width = 224
+        self.batch_width = 96
+        #self.batch_height = 224  #hardcode a default start for now
+        self.batch_height = 96
         self.cursor = 0
 
         # extract base folder path from csv file path
@@ -280,6 +282,7 @@ class GridIndividualImageDataset(GridDataset):
         
         countloss = 0
         for src in self.srcMeta:
+            print("fillSrc:",src['name'])
             data = src["data"][yRest:yBatch, xRest:xBatch]
             loss = src["loss"]
             batch[:,:,countloss] = (data-src["min"])*src["scale"]
