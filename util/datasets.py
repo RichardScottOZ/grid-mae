@@ -257,8 +257,17 @@ class GridIndividualImageDataset(GridDataset):
             yRest = np.random.randint(self.height - self.batch_height) #range to get sample from
             if self.usefulData[yRest+(self.batch_height>>1), xRest+(self.batch_width >> 1)]:
                 break
+
+        xBatch = xRest + self.batch_width
+        yBatch = yRest + self.batch_height
         
-    
+        countloss = 0
+        for src in self.srcMeta:
+            data = src["data"][yRest:yBatch, xRest:xBatch]
+            loss = src["loss"]
+            batch[:,:,countloss] = (data-src["min"])*src["scale"]
+            countloss += 1    
+
     def __len__(self):
         # this is the number of tiles
         return len(self.df)
