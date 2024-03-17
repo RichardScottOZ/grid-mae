@@ -335,10 +335,10 @@ class GridIndividualImageDataset(GridDataset):
 
     def __next__(self):
         if self.cursor >= self.batch_count:
-            raise StopIteration
+            raise StopIteration  # or something like this
         self.cursor += 1
         
-        batch = np.empty( (self.batch_size, self.bh, self.bw, self.batchDim), dtype=np.float32 )
+        batch = np.empty( (self.batch_size, self.batch_height, self.batch_width, self.batchDim), dtype=np.float32 )
         for i in range(self.batch_size):
             self.fill(batch[i])
         return batch    
@@ -355,33 +355,47 @@ class GridIndividualImageDataset(GridDataset):
         :param idx: Index of (image, label) pair in dataset dataframe. (c, h, w)
         :return: Torch Tensor images, and integer label as a dict.
         """
-        selection = self.df.iloc[idx]
+        if 1 == 2:
+            selection = self.df.iloc[idx]
 
-        folder = 'fmow-sentinel/train'
-        if 'val' in self.csv_path:
-            folder = 'fmow-sentinel/val'
-        elif 'test' in self.csv_path:
-            folder = 'fmow-sentinel/test_gt'
+            folder = 'fmow-sentinel/train'
+            if 'val' in self.csv_path:
+                folder = 'fmow-sentinel/val'
+            elif 'test' in self.csv_path:
+                folder = 'fmow-sentinel/test_gt'
 
-        cat = selection['category']
-        loc_id = selection['location_id']
-        img_id = selection['image_id']
-        image_path = '{0}/{1}_{2}/{3}_{4}_{5}.tif'.format(cat,cat,loc_id,cat,loc_id,img_id)
+            cat = selection['category']
+            loc_id = selection['location_id']
+            img_id = selection['image_id']
+            image_path = '{0}/{1}_{2}/{3}_{4}_{5}.tif'.format(cat,cat,loc_id,cat,loc_id,img_id)
 
-        abs_img_path = os.path.join(self.base_path, folder, image_path)
+            abs_img_path = os.path.join(self.base_path, folder, image_path)
 
-        images = self.open_image(abs_img_path)  # (h, w, c)
-        if self.masked_bands is not None:
-            images[:, :, self.masked_bands] = np.array(self.mean)[self.masked_bands]
+            images = self.open_image(abs_img_path)  # (h, w, c)
+            if self.masked_bands is not None:
+                images[:, :, self.masked_bands] = np.array(self.mean)[self.masked_bands]
 
-        labels = self.categories.index(selection['category'])
+            labels = self.categories.index(selection['category'])
 
-        img_as_tensor = self.transform(images)  # (c, h, w)
+        try:
+            batch = self.__next__()
+        except StopIteration:
+            self.__iter__()
+            batch = self.__next__()
+
+        #TODO #batches like this?
+
+        #np.transpose(data,(0,3,1,2))    
+            
+        #for index, images in enumerate(batch):
+        img_as_tensor = self.transform(batch[idx])  # (c, h, w)
+
+
         if self.dropped_bands is not None:
             keep_idxs = [i for i in range(img_as_tensor.shape[0]) if i not in self.dropped_bands]
             img_as_tensor = img_as_tensor[keep_idxs, :, :]
 
-
+            
         img_dn_2x = F.interpolate(img_as_tensor.unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
         img_dn_4x = F.interpolate(img_dn_2x.unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
 
