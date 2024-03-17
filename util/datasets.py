@@ -353,7 +353,7 @@ class GridIndividualImageDataset(GridDataset):
         
         #batch = np.empty( (self.batch_size, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
         getitem_batch = 1  # want one for this dataloader
-        batch = np.empty( (get_item_batch, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
+        batch = np.empty( (getitem_batch, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
         #print("NEXT BATCH SHAPE:",batch.shape)
         #for i in range(self.batch_size):
         for i in range(getitem_batch):            
