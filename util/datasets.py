@@ -113,7 +113,6 @@ def getRasterLayers(csv_path):
     
     srcMeta = []
     
-    
     for index, row in df_grid.iterrows():
         print("stats for:",row['category'])
         srcMeta.append({"name":row['category'], "loss":"mse"})
@@ -158,7 +157,8 @@ class GridIndividualImageDataset(GridDataset):
                  categories: Optional[List[str]] = None,
                  label_type: str = 'value',
                  masked_bands: Optional[List[int]] = None,
-                 dropped_bands = [0, 9, 10]):
+                 dropped_bands = [0, 9, 10],
+                 batch_size = None):
         """
         Creates dataset for multi-spectral single image classification.
         Usually used for fMoW-Sentinel dataset.
@@ -173,6 +173,8 @@ class GridIndividualImageDataset(GridDataset):
         super().__init__(in_c=13)
         self.csv_path = csv_path
         self.base_path = '/'
+        
+        self.batch_size = batch_size
 
         # extract base folder path from csv file path
         path_tokens = csv_path.split('/')
@@ -334,6 +336,7 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
     """
     file_path = os.path.join(args.train_path if is_train else args.test_path)
     
+    print(args)
     print("Train Path:",file_path)
 
 
@@ -341,7 +344,8 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
         mean = GridIndividualImageDataset.mean
         std = GridIndividualImageDataset.std
         transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
-        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands)
+        print(args.batch_size)
+        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands, batch_size=args.batch_size)
 
     else:
         raise ValueError(f"Invalid dataset type: {args.dataset_type}")
