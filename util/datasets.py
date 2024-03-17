@@ -394,11 +394,17 @@ class GridIndividualImageDataset(GridDataset):
 
             labels = self.categories.index(selection['category'])
 
-        try:
-            batch = self.__next__()
-        except StopIteration:
-            self.__iter__()
-            batch = self.__next__()
+        if 1 == 2:
+            try:
+                batch = self.__next__()
+            except StopIteration:
+                self.__iter__()
+                batch = self.__next__()
+
+        getitem_batch = 1  # want one for this dataloader
+        batch = np.empty( (getitem_batch, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
+        for i in range(getitem_batch):            
+            self.fill(batch[i])
 
         #TODO #batches like this?
 
