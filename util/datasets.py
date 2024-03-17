@@ -42,7 +42,7 @@ def getRasterLayers(csv_path):
 
     for srcData in srcMeta:
         with rasterio.open('dataset/grid/grid/' + srcData['name'] + '.tif') as src:
-            print(src.meta)
+            "getRLsrc:",print(src.meta)
             data = src.read(1, masked=True)
             mean.append(np.nanmean(data))
             std.append(np.nanstd(data))
@@ -234,8 +234,8 @@ class GridIndividualImageDataset(GridDataset):
             self.srcMeta.append({"name":row['category'], "loss":"mse"})
 
         for srcData in self.srcMeta:
-            with rasterio.open('dataset/grid/grid/' + row['category'] + '.tif') as src:
-                print(src.meta)
+            with rasterio.open('dataset/grid/grid/' + srcData['name'] + '.tif') as src:
+                print("selfsrcmeta:",src.meta)
                 data = src.read(1, masked=True)
                 self.mean.append(np.nanmean(data))
                 self.std.append(np.nanstd(data))
@@ -464,8 +464,13 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
         print(args.batch_size)
 
         rasters, mask = getRasterLayers(args.train_path)
+
+        print(rasters)
+
         mean = []
         std = []
+
+
         for r in rasters:
             mean.append(r['mean'])
             std.append(r['std'])
@@ -474,11 +479,9 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
         #transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, np.asarray(mean), np.asarray(std)) # input_size*2 = 96*2 = 192
         dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands, batch_size=args.batch_size)
 
-        
-
-        mean = GridIndividualImageDataset.mean
-        std = GridIndividualImageDataset.std
-        print("buildgridmean:",mean)
+        #mean = GridIndividualImageDataset.mean
+        #std = GridIndividualImageDataset.std
+        #print("buildgridmean:",mean)
 
     else:
         raise ValueError(f"Invalid dataset type: {args.dataset_type}")
