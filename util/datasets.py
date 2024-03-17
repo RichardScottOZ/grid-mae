@@ -271,7 +271,9 @@ class GridIndividualImageDataset(GridDataset):
         
         perEpoch = int((self.usefulData[::self.batch_height,::self.batch_width]>0).sum())
         self.batch_count = perEpoch // self.batch_size
-        self.perEpoch = self.batch_count * self.batch_size        
+        self.perEpoch = self.batch_count * self.batch_size       
+
+        print("PER_EPOCH:",self.perEpoch,self.batch_count,self.batch_size) 
         
     def fill(self, batch):
         while True:
@@ -405,7 +407,7 @@ class GridIndividualImageDataset(GridDataset):
 
         #print("IMG_AS_TENSOR.shape",img_as_tensor.shape)
 
-        if 1 == 1:
+        if 1 == 2:
             #print("BATCH 0 SHAPE:",batch[0].shape)
             #print("BATCH SHAPE BEFORE:",batch.shape)
             batch_p = batch.transpose(0,3,1,2)
@@ -422,7 +424,7 @@ class GridIndividualImageDataset(GridDataset):
         #print("IMG_DN_2x.shape",img_dn_2x.shape)
         #print("IMG_DN_4x.shape",img_dn_4x.shape)
 
-        if 1 == 1:
+        if 1 == 2:
             batch_p = np.empty((batch.shape[0],img_as_tensor.shape[0],img_as_tensor.shape[1],img_as_tensor.shape[2]))
             batch_p_2x = np.empty((batch_p.shape[0],img_dn_2x.shape[0],img_dn_2x.shape[1],img_dn_2x.shape[2]))
             batch_p_4x = np.empty((batch_p.shape[0],img_dn_4x.shape[0],img_dn_4x.shape[1],img_dn_4x.shape[2]))
@@ -453,7 +455,7 @@ class GridIndividualImageDataset(GridDataset):
     def build_transform(is_train, input_size, mean, std):
         # train transform
         interpol_mode = transforms.InterpolationMode.BICUBIC
-        print("FIRST GRIDNORM:",len(mean),len(std))
+        #print("FIRST GRIDNORM:",len(mean),len(std))
         t = []
         if is_train:
             t.append(GridNormalize(mean, std))  # use specific Sentinel normalization to avoid NaN
@@ -471,7 +473,7 @@ class GridIndividualImageDataset(GridDataset):
             crop_pct = 1.0
         size = int(input_size / crop_pct)
 
-        print("SECOND GRIDNORM:",len(mean),len(std))
+        #print("SECOND GRIDNORM:",len(mean),len(std))
         t.append(GridNormalize(mean, std))
         t.append(transforms.ToTensor())
         t.append(
