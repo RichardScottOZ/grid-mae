@@ -282,7 +282,7 @@ class GridIndividualImageDataset(GridDataset):
         
         countloss = 0
         for src in self.srcMeta:
-            print("fillSrc:",src['name'])
+            #print("fillSrc:",src['name'])
             data = src["data"][yRest:yBatch, xRest:xBatch]
             loss = src["loss"]
             batch[:,:,countloss] = (data-src["min"])*src["scale"]
@@ -308,7 +308,7 @@ class GridIndividualImageDataset(GridDataset):
             
         channels = 0
         for src in self.srcMeta:
-            data = src["data"][y0:y1, x0:x1]
+            data = src["data"][yRest:yBatch, xRest:xBatch]
             loss = src["loss"]
             if loss != 'mse':
                 #TODO
