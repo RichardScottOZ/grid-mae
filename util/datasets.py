@@ -285,13 +285,13 @@ class GridIndividualImageDataset(GridDataset):
         xBatch = xRest + self.batch_width
         yBatch = yRest + self.batch_height
         
-        countloss = 0
+        channels = 0
         for src in self.srcMeta:
             #print("fillSrc:",src['name'])
             data = src["data"][yRest:yBatch, xRest:xBatch]
             loss = src["loss"]
-            batch[:,:,countloss] = (data-src["min"])*src["scale"]
-            countloss += 1    
+            batch[:,:,channels] = (data-src["min"])*src["scale"]
+            channels += 1    
 
     def allocate_batch(self):
         # need something for inference eventually
