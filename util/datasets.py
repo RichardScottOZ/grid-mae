@@ -47,8 +47,8 @@ def getRasterLayers(csv_path):
             mean.append(np.nanmean(data))
             std.append(np.nanstd(data))
             
-            srcData['mean'] = mean
-            srcData['std'] = std
+            srcData['mean'] = np.nanmean(data)
+            srcData['std'] = np.nanstd(data)
             srcData['min'] = np.nanmin(data)
             srcData['max'] = np.nanmax(data)
             srcData['range'] = np.nanmax(data)
@@ -462,7 +462,15 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
     if args.dataset_type == 'grid':
         print(args.batch_size)
 
+        rasters, mask = getRasterLayers(args.train_path)
+        mean = []
+        std = []
+        for r in rasters:
+            mean.append(r['mean'])
+            std.append(r['std'])
+
         transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
+        #transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, np.asarray(mean), np.asarray(std)) # input_size*2 = 96*2 = 192
         dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands, batch_size=args.batch_size)
 
         
