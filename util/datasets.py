@@ -177,6 +177,7 @@ class GridIndividualImageDataset(GridDataset):
         self.batch_size = batch_size
         self.batch_width = 224
         self.batch_height = 224  #hardcode a default start for now
+        self.cursor = 0
 
         # extract base folder path from csv file path
         path_tokens = csv_path.split('/')
@@ -248,7 +249,7 @@ class GridIndividualImageDataset(GridDataset):
         self.width = self.usefulData.shape[1]
 
         batchDimension = 0
-        for src in srcMeta:
+        for src in self.srcMeta:
             #if put onehot or others in would need to expand this
             if src["loss"] != 'mse':
                 print("NEED TO FIX - add an error after")
@@ -327,6 +328,20 @@ class GridIndividualImageDataset(GridDataset):
         # TODO this is the number of tiles/batches/data as required 
         #return len(self.df)
         return self.batch_count
+    
+    def __iter__(self):
+        self.cursor = 0
+        return self
+
+    def __next__(self):
+        if self.cursor >= self.batch_count:
+            raise StopIteration
+        self.cursor += 1
+        
+        batch = np.empty( (self.batch_size, self.bh, self.bw, self.batchDim), dtype=np.float32 )
+        for i in range(self.batch_size):
+            self.fill(batch[i])
+        return batch    
 
     def open_image(self, img_path):
         with rasterio.open(img_path) as data:
