@@ -329,7 +329,7 @@ class GridIndividualImageDataset(GridDataset):
             crop_pct = 1.0
         size = int(input_size / crop_pct)
 
-        t.append(SentinelNormalize(mean, std))
+        t.append(GridNormalize(mean, std))
         t.append(transforms.ToTensor())
         t.append(
             transforms.Resize(size, interpolation=interpol_mode),  # to maintain same ratio w.r.t. 224 images
