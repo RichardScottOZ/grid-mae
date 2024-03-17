@@ -338,7 +338,7 @@ class GridIndividualImageDataset(GridDataset):
             raise StopIteration  # or something like this
         self.cursor += 1
         
-        batch = np.empty( (self.batch_size, self.batch_height, self.batch_width, self.batchDim), dtype=np.float32 )
+        batch = np.empty( (self.batch_size, self.batch_height, self.batch_width, self.batchDimension), dtype=np.float32 )
         for i in range(self.batch_size):
             self.fill(batch[i])
         return batch    
