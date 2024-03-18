@@ -504,7 +504,8 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
     :param args: Argparser args object with provided arguments
     :return: GridDataset object.
     """
-    file_path = os.path.join(args.train_path if is_train else args.test_path)
+    #file_path = os.path.join(args.train_path if is_train else args.test_path)
+    file_path = os.path.join(args.train_path)
     
     print(args)
     print("Train Path:",file_path)
