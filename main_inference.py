@@ -2,6 +2,7 @@ import argparse
 import os
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 import torch
 import torch.backends.cudnn as cudnn
@@ -216,15 +217,28 @@ def main(args):
             batch_p_4x[b] = F.interpolate(batch_p_2x[b].unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
 
 
-        prediction = model(batch_p_4x, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
+        predictions = model(batch_p_4x, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
+        print("PRED",predictions[2].shape)
+        print("MASK",predictions[3].shape)        
+
+        mt = predictions[2].detach().numpy()
+        print(mt.mean())
+        plt.imshow(mt[0,0,:,:])
+        plt.show()
         
         for tileid, (x,y) in enumerate(targets):
             # work out borders and centres and things here
 
-            print("TARGETS ID, X, Y",tileid,x,y,"TW:",tile_width,"TH:",tile_height)
+            print("TARGETS ID, X, Y",tileid,(x,y),"TW:",tile_width,"TH:",tile_height)
             pass
             #result[y:y+th, x:x+tw] = stuff from predictions yet to work out
-            #result[y,x] = predictions
+            #loss, ms_loss, pred, mask = print(predictions)
+            
+            #result[y,x] = predictions.detach().numpy()
+
+        print("RESULT SHAPE:",result.shape)
+        print("PREDICTIONS SHAPE:",predictions.detach().numpy().shape)
+        quit()
 
 
     for y in range(result_height):
