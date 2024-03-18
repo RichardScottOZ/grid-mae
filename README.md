@@ -121,4 +121,15 @@ python -m main_pretrain.py \
 
 ### 1 epoch test
 python  main_pretrain.py --batch_size 8 --accum_iter 16 --epochs 1 --warmup_epochs 1 --input_size 96 --patch_size 8 --mask_ratio 0.75 --model_type group_c --dataset_type grid --grouped_bands 0 --grouped_bands 1 --blr 0.0001 --num_workers 8 --input_channels 2 --output_dir ./output_dir --log_dir ./output_dir	
-	
+
+
+### TODO
+- The Hard Part
+	- geospatial inference
+- Handle nodata
+- Handle valid data
+- Handle one hot data [although mostly interested in other things here]
+	- Handle different loss functions
+
+
+
