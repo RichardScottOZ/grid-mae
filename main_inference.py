@@ -18,6 +18,8 @@ from util.misc import NativeScalerWithGradNormCount as NativeScaler
 import models_mae
 import models_mae_group_channels
 
+import torch.nn.functional as F
+
 
 def get_args_parser():
     parser = argparse.ArgumentParser('GridMAE pre-training', add_help=False)
@@ -180,12 +182,45 @@ def main(args):
     tile_width = args.input_size
     tile_height = args.input_size    
     
+    model.eval()
 
     def flushTargets():
         #get pred here
             
+        #mse_loss, l1_loss, _, _ = model(images, [images_up_2x, images_up_4x], mask_ratio=args.mask_ratio)
+        #need list of upscale for this model
+
+        img_as_tensor = dataset_inference.transform(batch[0])  # (c, h, w)
+
+        img_dn_2x = F.interpolate(img_as_tensor.unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
+        img_dn_4x = F.interpolate(img_dn_2x.unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
+
+        batch_p = np.empty((batch.shape[0],img_as_tensor.shape[0],img_as_tensor.shape[1],img_as_tensor.shape[2]), dtype=np.float32)
+        batch_p_2x = np.empty((batch_p.shape[0],img_dn_2x.shape[0],img_dn_2x.shape[1],img_dn_2x.shape[2]), dtype=np.float32)
+        batch_p_4x = np.empty((batch_p.shape[0],img_dn_4x.shape[0],img_dn_4x.shape[1],img_dn_4x.shape[2]), dtype=np.float32)
+
+        batch_p = torch.tensor(batch_p)
+        batch_p_2x = torch.tensor(batch_p_2x)
+        batch_p_4x = torch.tensor(batch_p_4x)
+
+        for b in range(batch_p.shape[0]):
+            #print("B:",b)
+            #print("B TRANSFORM SHAPE:",self.transform(batch[b]).shape )
+            #print("BATCH P[0] SHAPE:",batch_p[b].shape)
+            #print("BATCH B[0] SHAPE:",batch[b].shape)
+            batch_p[b] = dataset_inference.transform(batch[b])
+
+        for b in range(batch_p_2x.shape[0]):
+            batch_p_2x[b] = F.interpolate(batch_p[b].unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
+            #for b in range(batch_p_4x.shape[0]):
+            batch_p_4x[b] = F.interpolate(batch_p_2x[b].unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
+
+
+        prediction = model(batch_p_4x, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
+        
         for tileid, (x,y) in enumerate(targets):
             # work out borders and centres and things here
+
             print("TARGETS ID, X, Y",tileid,x,y,"TW:",tile_width,"TH:",tile_height)
             pass
             #result[y:y+th, x:x+tw] = stuff from predictions yet to work out
