@@ -185,20 +185,16 @@ def main(args):
     
     model.eval()
 
-        # Assuming 'model' is an instance of your MaskedAutoencoderGroupChannelViT model
-    # and 'layer_name' is the name of the layer you want to extract features from
-    # For example, if the last transformer block is named 'blocks.23' (assuming 24 blocks in total)
-
     normhook = {}
     def get_normhook(name):
         def hook(model, input, output):
-            normhook[name + '_output'] = output
+            normhook[name] = output
         return hook
 
 
     def get_block11(name):
         def hook(model, input, output):
-            normhook[name + '_output'] = output
+            normhook[name] = output
         return hook
 
     #def get_decembed(name):
@@ -261,30 +257,11 @@ def main(args):
         #plt.imshow(mt[0,:,:,0:1])
         #plt.show()
 
+        print("LENNORMHOOK:",len(normhook['normhookt']))
+        print("LENBLOCK11HOOK:",len(normhook['block11hook']))
 
-        #feature_extractor = FeatureExtractor(model, 'norm')
-        #output = feature_extractor(batch_orig, [batch_p_2x, batch_p])
-        #output = feature_extractor(batch_orig)
-        #print("OUTPUT:",output.shape)
-        #out = feature_extractor(batch_orig, [batch_p_2x, batch_p])
-        #out = model(batch_orig, [batch_p_2x, batch_p])
-        #out = model(x)
-        print("NORMHOOK:",normhook['normhook'].shape,normhook['normhook'].mean())
-        print("NORMHOOK:",normhook['normhook'].shape,normhook['normhook'].mean(axis=0).shape)
-        print("NORMHOOK:",normhook['normhook'].shape,normhook['normhook'].mean(axis=1).shape)
-        print("BLOCK11HOOK:",normhook['block11hook'].shape,normhook['block11hook'].mean())
-        print("BLOCK11HOOK:",normhook['block11hook'].shape,normhook['block11hook'].mean(axis=0).shape)
-        print("BLOCK11HOOK:",normhook['block11hook'].shape,normhook['block11hook'].mean(axis=1).shape)
-        
-        print("DECEMBEDHOOK:",normhook['decembedhook'].shape,normhook['decembedhook'].mean())
-        print("DECEMBEDHOOK:",normhook['decembedhook'].shape,normhook['decembedhook'].mean(axis=0).shape)
-        print("DECEMBEDHOOK:",normhook['decembedhook'].shape,normhook['decembedhook'].mean(axis=1).shape)
-
-        
-        print("LENNORMHOOK:",len(normhook['normhook_output']))
         #for o in normhook['normhook_output']:
             #print("OUTPUTLOOP:",o.shape)
-
 
         for tileid, (x,y) in enumerate(targets):
             # work out borders and centres and things here
