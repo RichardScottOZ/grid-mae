@@ -1,6 +1,7 @@
 import argparse
 import os
 import numpy as np
+from tqdm import tqdm
 
 import torch
 import torch.backends.cudnn as cudnn
@@ -168,6 +169,40 @@ def main(args):
 
     batch = np.empty((args.batch_size,args.input_size,args.input_size, args.input_channels))
     print("BATCH SHAPE:",batch.shape)
+    batch_length = len(batch)
+    print("BATCH LENGTH:",len(batch))
+
+    batch_count = 0
+    targets = []
+
+    tile_width = args.input_size
+    tile_height = args.input_size    
+    
+
+    def flushTargets():
+        #get pred here
+            
+        for tileid, (x,y) in enumerate(targets):
+            # work out borders and centres and things here
+            print("TARGETS ID, X, Y",tileid,x,y,"TW:",tile_width,"TH:",tile_height)
+            pass
+            #result[y:y+th, x:x+tw] = stuff from predictions
+
+
+    for y in range(DH):
+        yStart = y * tile_height
+        for x in range(DW):
+            xStart = x * tile_width
+            #get tile with coords for batch[batch_count]
+            targets.append((xStart, yStart))
+            #print("x,y,xStart,yStart:",x,y,xStart,yStart)
+            batch_count += 1
+
+            if batch_count >= batch_length:
+                flushTargets()
+                targets = []
+                batch_count = 0
+
 
     #print(srcMeta)
 
