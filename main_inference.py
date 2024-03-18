@@ -159,12 +159,12 @@ def main(args):
 
     # this will need adjusting later to get nice predictions, borders, edges etc.
     resultsShape = srcUseful[::args.input_size,::args.input_size].shape
-    DH, DW = resultsShape
+    result_height, result_width = resultsShape
 
     print("IntSum:",srcUseful[::args.input_size,::args.input_size].shape)
     print("IntSum:",srcUseful[::args.input_size,::args.input_size].sum())
 
-    result = np.zeros( (DH,DW,outputFeatures), dtype=np.float32 )
+    result = np.zeros( (result_height, result_width, outputFeatures), dtype=np.float32 )
     print("RESULT SHAPE:",result.shape)
 
     batch = np.empty((args.batch_size,args.input_size,args.input_size, args.input_channels))
@@ -186,12 +186,13 @@ def main(args):
             # work out borders and centres and things here
             print("TARGETS ID, X, Y",tileid,x,y,"TW:",tile_width,"TH:",tile_height)
             pass
-            #result[y:y+th, x:x+tw] = stuff from predictions
+            #result[y:y+th, x:x+tw] = stuff from predictions yet to work out
+            #result[y,x] = predictions
 
 
-    for y in range(DH):
+    for y in range(result_height):
         yStart = y * tile_height
-        for x in range(DW):
+        for x in range(result_width):
             xStart = x * tile_width
             #get tile with coords for batch[batch_count]
             targets.append((xStart, yStart))
