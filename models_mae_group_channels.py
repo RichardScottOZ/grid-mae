@@ -230,6 +230,8 @@ class MaskedAutoencoderGroupChannelViT(nn.Module):
         c: Number of channels
         imgs: (N, C, H, W)
         """
+        #print("unpatchify:x, p, c",x,p,c)
+        
         h = w = int(x.shape[1] ** .5)
         assert h * w == x.shape[1]
 
@@ -269,6 +271,7 @@ class MaskedAutoencoderGroupChannelViT(nn.Module):
     def forward_encoder(self, x, mask_ratio):
         # x is (N, C, H, W)
         b, c, h, w = x.shape
+        #print("X IN:",x.shape)
 
         x_c_embed = []
         for i, group in enumerate(self.channel_groups):
@@ -278,14 +281,23 @@ class MaskedAutoencoderGroupChannelViT(nn.Module):
         x = torch.stack(x_c_embed, dim=1)  # (N, G, L, D)
         _, G, L, D = x.shape
 
+        #print("X AFTER EMBED:",x.shape)
+
         # add channel embed
         channel_embed = self.channel_embed.unsqueeze(2)  # (1, G, 1, cD)
         pos_embed = self.pos_embed[:, 1:, :].unsqueeze(1)  # (1, 1, L, pD)
+
+        #print("CHANNEL EMBED:",channel_embed.shape)
+        #print("POS EMBED:",pos_embed.shape)
 
         # Channel embed same across (x,y) position, and pos embed same across channel (c)
         channel_embed = channel_embed.expand(-1, -1, pos_embed.shape[2], -1)  # (1, G, L, cD)
         pos_embed = pos_embed.expand(-1, channel_embed.shape[1], -1, -1)  # (1, G, L, pD)
         pos_channel = torch.cat((pos_embed, channel_embed), dim=-1)  # (1, G, L, D)
+
+        #print("CHANNEL EMBED:",channel_embed.shape)
+        #print("POS EMBED:",pos_embed.shape)
+        #print("POS CHANNEL:",pos_channel.shape)
 
         # add pos embed w/o cls token
         x = x + pos_channel  # (N, G, L, D)
@@ -304,11 +316,16 @@ class MaskedAutoencoderGroupChannelViT(nn.Module):
 
         # append cls token
         cls_tokens = self.cls_token.expand(x.shape[0], -1, -1)
+        #print("CLS TOKENS",cls_tokens.shape)
+        #print("X BEFORE CLS:",x.shape)
         x = torch.cat((cls_tokens, x), dim=1)  # (N, G*L + 1, D)
+        #print("X AFTER CLS:",x.shape)
 
         # apply Transformer blocks
         for blk in self.blocks:
+            #print("blkb4:",x.shape)
             x = blk(x)
+            #print("blk:",x.shape)
         x = self.norm(x)
 
         return x, mask, ids_restore
