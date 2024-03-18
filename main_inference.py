@@ -204,6 +204,8 @@ def main(args):
         batch_p_2x = torch.tensor(batch_p_2x)
         batch_p_4x = torch.tensor(batch_p_4x)
 
+        batch_orig = batch.transpose(0,3,1,2)
+
         for b in range(batch_p.shape[0]):
             #print("B:",b)
             #print("B TRANSFORM SHAPE:",self.transform(batch[b]).shape )
@@ -222,9 +224,10 @@ def main(args):
         print("MASK",predictions[3].shape)        
 
         mt = predictions[2].detach().numpy()
-        print(mt.mean())
-        plt.imshow(mt[0,0,:,:])
-        plt.show()
+        #print(mt.mean())
+        #mt = mt.transpose(0,2,3,1)
+        #plt.imshow(mt[0,:,:,0:1])
+        #plt.show()
         
         for tileid, (x,y) in enumerate(targets):
             # work out borders and centres and things here
