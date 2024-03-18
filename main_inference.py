@@ -330,7 +330,22 @@ def main(args):
 
 
     #print(srcMeta)
-    saveResultsFeatures(result, 'result3.tif')
+    saveResultsFeatures(result, 'result3.tif', downscale=args.input_size)
+
+    
+
+    from sklearn.decomposition import PCA
+    PCA_SIZE = 32
+
+    validPcaPoints = srcUseful[::args.input_size,::args.input_size].flatten()
+    pca = PCA(n_components=PCA_SIZE)
+    pca.fit( result.reshape(-1,outputFeatures)[validPcaPoints] )
+
+    vecs = pca.transform(  result.reshape(-1,outputFeatures) )
+    vecs[validPcaPoints==False] = 0
+    vecs = vecs.reshape( result_height,result_width, -1 )
+
+    saveResultsFeatures(vecs,  'vec3.tif', downscale=args.input_size)
 
 if __name__ == '__main__':
     args = get_args_parser()
