@@ -185,24 +185,29 @@ def main(args):
     
     model.eval()
 
-    class FeatureExtractor:
-        def __init__(self, model, layer_name):
-            self.model = model
-            self.layer_name = layer_name
-            self.features = None
-
-        def hook(self, module, input, output):
-            self.features = output
-
-        def __call__(self, x):
-            handle = self.model._modules.get(self.layer_name).register_forward_hook(self.hook)
-            self.model(x)
-            handle.remove()
-            return self.features
-
-    # Assuming 'model' is an instance of your MaskedAutoencoderGroupChannelViT model
+        # Assuming 'model' is an instance of your MaskedAutoencoderGroupChannelViT model
     # and 'layer_name' is the name of the layer you want to extract features from
     # For example, if the last transformer block is named 'blocks.23' (assuming 24 blocks in total)
+
+    normhook = {}
+    def get_normhook(name):
+        def hook(model, input, output):
+            normhook[name] = output[0].detach()
+            normhook[name + '_output'] = output
+        return hook
+
+
+    def get_block11(name):
+        def hook(model, input, output):
+            normhook[name] = output[0].detach()
+            normhook[name + '_output'] = output
+        return hook
+
+        
+    model.norm.register_forward_hook(get_normhook("normhook"))
+    model.blocks[11].mlp.fc2.register_forward_hook(get_block11("block11hook"))
+
+
 
     def flushTargets():
         #get pred here
@@ -240,6 +245,8 @@ def main(args):
 
 
         #predictions = model(batch_p_4x, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
+        #predictions = model(batch_orig, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
+
         predictions = model(batch_orig, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
         print("PRED",predictions[2].shape)
         print("MASK",predictions[3].shape)        
@@ -247,9 +254,28 @@ def main(args):
         mt = predictions[2].detach().numpy()
         print(mt.mean())
         mt = mt.transpose(0,2,3,1)
-        plt.imshow(mt[0,:,:,0:1])
-        plt.show()
-        
+        #plt.imshow(mt[0,:,:,0:1])
+        #plt.show()
+
+
+        #feature_extractor = FeatureExtractor(model, 'norm')
+        #output = feature_extractor(batch_orig, [batch_p_2x, batch_p])
+        #output = feature_extractor(batch_orig)
+        #print("OUTPUT:",output.shape)
+        #out = feature_extractor(batch_orig, [batch_p_2x, batch_p])
+        #out = model(batch_orig, [batch_p_2x, batch_p])
+        #out = model(x)
+        print("NORMHOOK:",normhook['normhook'].shape,normhook['normhook'].mean())
+        print("NORMHOOK:",normhook['normhook'].shape,normhook['normhook'].mean(axis=0).shape)
+        print("NORMHOOK:",normhook['normhook'].shape,normhook['normhook'].mean(axis=1).shape)
+        print("BLOCK11HOOK:",normhook['block11hook'].shape,normhook['block11hook'].mean())
+        print("BLOCK11HOOK:",normhook['block11hook'].shape,normhook['block11hook'].mean(axis=0).shape)
+        print("BLOCK11HOOK:",normhook['block11hook'].shape,normhook['block11hook'].mean(axis=1).shape)
+
+        #for o in normhook['normhook_output']:
+            #print("OUTPUTLOOP:",o.shape)
+
+
         for tileid, (x,y) in enumerate(targets):
             # work out borders and centres and things here
 
