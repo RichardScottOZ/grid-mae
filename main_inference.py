@@ -185,6 +185,25 @@ def main(args):
     
     model.eval()
 
+    class FeatureExtractor:
+        def __init__(self, model, layer_name):
+            self.model = model
+            self.layer_name = layer_name
+            self.features = None
+
+        def hook(self, module, input, output):
+            self.features = output
+
+        def __call__(self, x):
+            handle = self.model._modules.get(self.layer_name).register_forward_hook(self.hook)
+            self.model(x)
+            handle.remove()
+            return self.features
+
+    # Assuming 'model' is an instance of your MaskedAutoencoderGroupChannelViT model
+    # and 'layer_name' is the name of the layer you want to extract features from
+    # For example, if the last transformer block is named 'blocks.23' (assuming 24 blocks in total)
+
     def flushTargets():
         #get pred here
             
@@ -204,7 +223,8 @@ def main(args):
         batch_p_2x = torch.tensor(batch_p_2x)
         batch_p_4x = torch.tensor(batch_p_4x)
 
-        batch_orig = batch.transpose(0,3,1,2)
+        batch_orig = torch.tensor(batch.transpose(0,3,1,2).astype(np.float32))
+        print("BATCH ORIG:",batch_orig.shape)
 
         for b in range(batch_p.shape[0]):
             #print("B:",b)
@@ -219,15 +239,16 @@ def main(args):
             batch_p_4x[b] = F.interpolate(batch_p_2x[b].unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
 
 
-        predictions = model(batch_p_4x, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
+        #predictions = model(batch_p_4x, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
+        predictions = model(batch_orig, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
         print("PRED",predictions[2].shape)
         print("MASK",predictions[3].shape)        
 
         mt = predictions[2].detach().numpy()
-        #print(mt.mean())
-        #mt = mt.transpose(0,2,3,1)
-        #plt.imshow(mt[0,:,:,0:1])
-        #plt.show()
+        print(mt.mean())
+        mt = mt.transpose(0,2,3,1)
+        plt.imshow(mt[0,:,:,0:1])
+        plt.show()
         
         for tileid, (x,y) in enumerate(targets):
             # work out borders and centres and things here
