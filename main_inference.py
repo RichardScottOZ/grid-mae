@@ -127,8 +127,6 @@ def saveResultsFeatures(image, outName,downscale=96,x0=0,y0=0,nodata=None):
     left = w + x0*gpx
     top  = n + y0*gpy
     newPix2Geo = rio.transform.from_bounds(left, top+gpy*downscale, left+gpx*downscale, top, 1, 1)
-    #print(" transform was:\n" , pix2Geo)
-    #print(" transform is:\n" , newPix2Geo)
 
     with rio.open(outName, 'w', width=outW,height=outH,
        driver="GTiff",count=outD,crs=crs,
@@ -279,8 +277,8 @@ def main(args):
         #predictions = model(batch_orig, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
 
         predictions = model(batch_orig, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
-        print("PRED",predictions[2].shape)
-        print("MASK",predictions[3].shape)        
+        #print("PRED",predictions[2].shape)
+        #print("MASK",predictions[3].shape)        
 
         #mt = predictions[2].detach().numpy()
         #print(mt.mean())
@@ -293,7 +291,7 @@ def main(args):
 
         #for o in normhook['normhook']:
             #print("OUTPUTLOOP:",o.shape)
-        print("RESULT MEAN BEFORE:",result.mean())
+        #print("RESULT MEAN BEFORE:",result.mean())
 
         for tileid, (x,y) in enumerate(targets):
             # work out borders and centres and things here
@@ -307,13 +305,10 @@ def main(args):
             #print(normhook['block11hook'][tileid,:,:].detach().numpy().shape)
             result[y,x] = normhook['block11hook'][tileid,:,:].detach().numpy().mean(axis=0)
 
-        print("RESULT SHAPE:",result.shape)
+        #print("RESULT SHAPE:",result.shape)
         print("RESULT MEAN AFTER:",result.mean())
 
-        
-
         #quit()
-
 
     for y in range(result_height):
         yStart = y * tile_height
