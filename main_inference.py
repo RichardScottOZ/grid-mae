@@ -21,6 +21,8 @@ import models_mae_group_channels
 
 import torch.nn.functional as F
 
+import rasterio as rio
+
 
 def get_args_parser():
     parser = argparse.ArgumentParser('GridMAE pre-training', add_help=False)
@@ -104,7 +106,41 @@ def load_model(args, model_without_ddp, optimizer, loss_scaler):
                 loss_scaler.load_state_dict(checkpoint['scaler'])
             print("With optim & sched!")
 
+def saveOutputTensor(image, outName,downscale=1,x0=0,y0=0,nodata=None):
+    dataDir = args.train_path.replace('train.csv','')
+    refName = dataDir + "grid/magnetics.tif"
 
+    if len(image.shape)==2:
+       outH,outW = image.shape
+       outD = 1
+    else:
+       outH,outW,outD = image.shape
+    with rio.open(refName, "r") as f:
+        pix2Geo = f.transform
+        crs = f.crs
+
+    if downscale<1:
+       downscale = 1
+    w,s,e,n = rio.transform.array_bounds(1, 1, pix2Geo)
+    gpx = pix2Geo[0]
+    gpy = pix2Geo[4]
+    left = w + x0*gpx
+    top  = n + y0*gpy
+    newPix2Geo = rio.transform.from_bounds(left, top+gpy*downscale, left+gpx*downscale, top, 1, 1)
+    #print(" transform was:\n" , pix2Geo)
+    #print(" transform is:\n" , newPix2Geo)
+
+    with rio.open(outName, 'w', width=outW,height=outH,
+       driver="GTiff",count=outD,crs=crs,
+       compress="lzw",
+       tiled=True, blockxsize=256, blockysize=256, nodata=nodata,
+       transform=newPix2Geo, dtype=image.dtype) as file:
+            if outD==1:
+                file.write(image.reshape(outH,outW), 1 )
+            else:
+                file.write(np.transpose(image,(2,0,1)), [i for i in range(1,outD+1)] )
+
+    print("Wrote",outName)
 
 def main(args):
     if args.model_type == 'group_c':
@@ -149,8 +185,6 @@ def main(args):
 
     print(model_without_ddp.cls_token.mean(), model_without_ddp.cls_token.shape)
 
-    #blocks.11.mlp.fc2.weight torch.Size([768, 3072])
-
     dataset_inference = build_grid_dataset(is_train=False, args=args)
 
     srcMeta, srcUseful = getRasterLayers(args.train_path)
@@ -173,9 +207,9 @@ def main(args):
     print("RESULT SHAPE:",result.shape)
 
     batch = np.empty((args.batch_size,args.input_size,args.input_size, args.input_channels))
-    print("BATCH SHAPE:",batch.shape)
+    #print("BATCH SHAPE:",batch.shape)
     batch_length = len(batch)
-    print("BATCH LENGTH:",len(batch))
+    #print("BATCH LENGTH:",len(batch))
 
     batch_count = 0
     targets = []
@@ -202,11 +236,9 @@ def main(args):
             #normhook[name + '_output'] = output
         #return hook
 
-        
     model.norm.register_forward_hook(get_normhook("normhook"))
     model.blocks[11].mlp.fc2.register_forward_hook(get_block11("block11hook"))
     #model.decoder_embed.register_forward_hook(get_decembed("decembedhook"))
-
 
 
     def flushTargets():
@@ -229,7 +261,7 @@ def main(args):
         batch_p_4x = torch.tensor(batch_p_4x)
 
         batch_orig = torch.tensor(batch.transpose(0,3,1,2).astype(np.float32))
-        print("BATCH ORIG:",batch_orig.shape)
+        #print("BATCH ORIG:",batch_orig.shape)
 
         for b in range(batch_p.shape[0]):
             #print("B:",b)
@@ -243,7 +275,6 @@ def main(args):
             #for b in range(batch_p_4x.shape[0]):
             batch_p_4x[b] = F.interpolate(batch_p_2x[b].unsqueeze(0), scale_factor=0.5, mode='bilinear').squeeze(0)
 
-
         #predictions = model(batch_p_4x, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
         #predictions = model(batch_orig, [batch_p_2x, batch_p], mask_ratio=args.mask_ratio)
 
@@ -251,17 +282,18 @@ def main(args):
         print("PRED",predictions[2].shape)
         print("MASK",predictions[3].shape)        
 
-        mt = predictions[2].detach().numpy()
-        print(mt.mean())
-        mt = mt.transpose(0,2,3,1)
+        #mt = predictions[2].detach().numpy()
+        #print(mt.mean())
+        #mt = mt.transpose(0,2,3,1)
         #plt.imshow(mt[0,:,:,0:1])
         #plt.show()
 
-        print("LENNORMHOOK:",len(normhook['normhookt']))
-        print("LENBLOCK11HOOK:",len(normhook['block11hook']))
+        #print("LENNORMHOOK:",len(normhook['normhook']))
+        #print("LENBLOCK11HOOK:",len(normhook['block11hook']))
 
-        #for o in normhook['normhook_output']:
+        #for o in normhook['normhook']:
             #print("OUTPUTLOOP:",o.shape)
+        print("RESULT MEAN BEFORE:",result.mean())
 
         for tileid, (x,y) in enumerate(targets):
             # work out borders and centres and things here
@@ -271,19 +303,27 @@ def main(args):
             #result[y:y+th, x:x+tw] = stuff from predictions yet to work out
             #loss, ms_loss, pred, mask = print(predictions)
             
-            #result[y,x] = predictions.detach().numpy()
+            #print(normhook['block11hook'][tileid,:,:].detach().numpy().mean(axis=0))
+            #print(normhook['block11hook'][tileid,:,:].detach().numpy().shape)
+            result[y,x] = normhook['block11hook'][tileid,:,:].detach().numpy().mean(axis=0)
 
         print("RESULT SHAPE:",result.shape)
-        quit()
+        print("RESULT MEAN AFTER:",result.mean())
+
+        
+
+        #quit()
 
 
     for y in range(result_height):
         yStart = y * tile_height
         for x in range(result_width):
+            #xStart = x * tile_width
             xStart = x * tile_width
             #get tile with coords for batch[batch_count]
             dataset_inference.get_tile( xStart, yStart, batch[batch_count])
-            targets.append((xStart, yStart))
+            #targets.append((xStart, yStart))
+            targets.append((x, y))
             #print("x,y,xStart,yStart:",x,y,xStart,yStart)
             batch_count += 1
 
@@ -295,6 +335,7 @@ def main(args):
 
 
     #print(srcMeta)
+    saveOutputTensor(result, 'result2.tif')
 
 if __name__ == '__main__':
     args = get_args_parser()
