@@ -148,6 +148,11 @@ def main(args):
 
     input_shape = srcUseful.shape
     print("INPUT SHAPE:",input_shape)
+    print("OUTPUT DIMS:","")
+    print("INPUT SIZE:",args.input_size)
+
+    print("IntSum:",srcUseful[::args.input_size,::args.input_size].shape)
+    print("IntSum:",srcUseful[::args.input_size,::args.input_size].sum())
 
     #print(srcMeta)
 
