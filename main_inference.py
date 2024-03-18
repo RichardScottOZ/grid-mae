@@ -164,6 +164,7 @@ def main(args):
     print("IntSum:",srcUseful[::args.input_size,::args.input_size].sum())
 
     result = np.zeros( (DH,DW,outputFeatures), dtype=np.float32 )
+    print("RESULT SHAPE:",result.shape)
 
     #print(srcMeta)
 
