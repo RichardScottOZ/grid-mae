@@ -161,7 +161,7 @@ def main(args):
     resultsShape = srcUseful[::args.input_size,::args.input_size].shape
     result_height, result_width = resultsShape
 
-    print("IntSum:",srcUseful[::args.input_size,::args.input_size].shape)
+    print("IntShape:",srcUseful[::args.input_size,::args.input_size].shape)
     print("IntSum:",srcUseful[::args.input_size,::args.input_size].sum())
 
     result = np.zeros( (result_height, result_width, outputFeatures), dtype=np.float32 )
