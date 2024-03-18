@@ -146,6 +146,9 @@ def main(args):
 
     srcMeta, srcUseful = getRasterLayers(args.train_path)
 
+    input_shape = srcUseful.shape
+    print("INPUT SHAPE:",input_shape)
+
     #print(srcMeta)
 
 if __name__ == '__main__':
