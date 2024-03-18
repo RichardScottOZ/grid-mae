@@ -148,6 +148,8 @@ def main(args):
 
     #blocks.11.mlp.fc2.weight torch.Size([768, 3072])
 
+    dataset_inference = build_grid_dataset(is_train=False, args=args)
+
     srcMeta, srcUseful = getRasterLayers(args.train_path)
 
     input_shape = srcUseful.shape
@@ -195,12 +197,14 @@ def main(args):
         for x in range(result_width):
             xStart = x * tile_width
             #get tile with coords for batch[batch_count]
+            dataset_inference.get_tile( xStart, yStart, batch[batch_count])
             targets.append((xStart, yStart))
             #print("x,y,xStart,yStart:",x,y,xStart,yStart)
             batch_count += 1
 
             if batch_count >= batch_length:
                 flushTargets()
+                print(batch.mean())
                 targets = []
                 batch_count = 0
 
