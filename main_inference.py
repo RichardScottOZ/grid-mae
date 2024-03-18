@@ -1,5 +1,6 @@
 import argparse
 import os
+import numpy as np
 
 import torch
 import torch.backends.cudnn as cudnn
@@ -144,15 +145,25 @@ def main(args):
 
     print(model_without_ddp.cls_token.mean(), model_without_ddp.cls_token.shape)
 
+    #blocks.11.mlp.fc2.weight torch.Size([768, 3072])
+
     srcMeta, srcUseful = getRasterLayers(args.train_path)
 
     input_shape = srcUseful.shape
     print("INPUT SHAPE:",input_shape)
-    print("OUTPUT DIMS:","")
+    
+    outputFeatures = model_without_ddp.cls_token.squeeze().shape[0]
+    print("OUTPUT FEATURES:", model_without_ddp.cls_token.squeeze().shape[0]) #hardcode for now, get from model later.
     print("INPUT SIZE:",args.input_size)
+
+    # this will need adjusting later to get nice predictions, borders, edges etc.
+    resultsShape = srcUseful[::args.input_size,::args.input_size].shape
+    DH, DW = resultsShape
 
     print("IntSum:",srcUseful[::args.input_size,::args.input_size].shape)
     print("IntSum:",srcUseful[::args.input_size,::args.input_size].sum())
+
+    result = np.zeros( (DH,DW,outputFeatures), dtype=np.float32 )
 
     #print(srcMeta)
 
