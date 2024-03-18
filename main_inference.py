@@ -106,7 +106,7 @@ def load_model(args, model_without_ddp, optimizer, loss_scaler):
                 loss_scaler.load_state_dict(checkpoint['scaler'])
             print("With optim & sched!")
 
-def saveOutputTensor(image, outName,downscale=1,x0=0,y0=0,nodata=None):
+def saveResultsFeatures(image, outName,downscale=96,x0=0,y0=0,nodata=None):
     dataDir = args.train_path.replace('train.csv','')
     refName = dataDir + "grid/magnetics.tif"
 
@@ -335,7 +335,7 @@ def main(args):
 
 
     #print(srcMeta)
-    saveOutputTensor(result, 'result2.tif')
+    saveResultsFeatures(result, 'result3.tif')
 
 if __name__ == '__main__':
     args = get_args_parser()
