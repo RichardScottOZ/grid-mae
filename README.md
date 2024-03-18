@@ -124,12 +124,16 @@ python  main_pretrain.py --batch_size 8 --accum_iter 16 --epochs 1 --warmup_epoc
 
 
 ### TODO
-- The Hard Part
-	- geospatial inference
+- Training
+	- Handle nodata [same thing as below basically]
 - Handle nodata
 - Handle valid data
 - Handle one hot data [although mostly interested in other things here]
 	- Handle different loss functions
+- The Hard Part
+	- geospatial inference [BASICS DONE]
+		- Check for edge cases
+	
 
 
 
