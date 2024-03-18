@@ -166,6 +166,9 @@ def main(args):
     result = np.zeros( (DH,DW,outputFeatures), dtype=np.float32 )
     print("RESULT SHAPE:",result.shape)
 
+    batch = np.empty((args.batch_size,args.input_size,args.input_size, args.input_channels))
+    print("BATCH SHAPE:",batch.shape)
+
     #print(srcMeta)
 
 if __name__ == '__main__':
