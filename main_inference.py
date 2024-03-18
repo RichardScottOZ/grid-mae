@@ -192,20 +192,24 @@ def main(args):
     normhook = {}
     def get_normhook(name):
         def hook(model, input, output):
-            normhook[name] = output[0].detach()
             normhook[name + '_output'] = output
         return hook
 
 
     def get_block11(name):
         def hook(model, input, output):
-            normhook[name] = output[0].detach()
             normhook[name + '_output'] = output
         return hook
+
+    #def get_decembed(name):
+        #def hook(model, input, output):
+            #normhook[name + '_output'] = output
+        #return hook
 
         
     model.norm.register_forward_hook(get_normhook("normhook"))
     model.blocks[11].mlp.fc2.register_forward_hook(get_block11("block11hook"))
+    #model.decoder_embed.register_forward_hook(get_decembed("decembedhook"))
 
 
 
@@ -271,7 +275,13 @@ def main(args):
         print("BLOCK11HOOK:",normhook['block11hook'].shape,normhook['block11hook'].mean())
         print("BLOCK11HOOK:",normhook['block11hook'].shape,normhook['block11hook'].mean(axis=0).shape)
         print("BLOCK11HOOK:",normhook['block11hook'].shape,normhook['block11hook'].mean(axis=1).shape)
+        
+        print("DECEMBEDHOOK:",normhook['decembedhook'].shape,normhook['decembedhook'].mean())
+        print("DECEMBEDHOOK:",normhook['decembedhook'].shape,normhook['decembedhook'].mean(axis=0).shape)
+        print("DECEMBEDHOOK:",normhook['decembedhook'].shape,normhook['decembedhook'].mean(axis=1).shape)
 
+        
+        print("LENNORMHOOK:",len(normhook['normhook_output']))
         #for o in normhook['normhook_output']:
             #print("OUTPUTLOOP:",o.shape)
 
