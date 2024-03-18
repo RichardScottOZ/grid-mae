@@ -261,7 +261,6 @@ def main(args):
             #result[y,x] = predictions.detach().numpy()
 
         print("RESULT SHAPE:",result.shape)
-        print("PREDICTIONS SHAPE:",predictions.detach().numpy().shape)
         quit()
 
 
