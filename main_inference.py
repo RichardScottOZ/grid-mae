@@ -10,11 +10,12 @@ assert timm.__version__ >= "0.3.2"  # version check  #0.4.12 used here as per sa
 import timm.optim.optim_factory as optim_factory
 
 import util.misc as misc
-from util.datasets import build_grid_dataset
+from util.datasets import build_grid_dataset, getRasterLayers
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
 import models_mae
 import models_mae_group_channels
+
 
 def get_args_parser():
     parser = argparse.ArgumentParser('GridMAE pre-training', add_help=False)
@@ -143,16 +144,9 @@ def main(args):
 
     print(model_without_ddp.cls_token.mean(), model_without_ddp.cls_token.shape)
 
-    ## want to access somewhere here    
-    def dummy_example forward_encoder(self, x, mask_ratio):
-        # do all the stuff
-        # Apply Transformer blocks
-        for blk in self.blocks:
-            x = blk(x)
-        
-        # Before normalization, return the output of the last transformer block
-        # This is the 768 features layer final from the encoder
-        return x, mask, ids_restore
+    srcMeta, srcUseful = getRasterLayers(args.train_path)
+
+    #print(srcMeta)
 
 if __name__ == '__main__':
     args = get_args_parser()
