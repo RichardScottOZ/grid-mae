@@ -128,6 +128,8 @@ python  main_pretrain.py --batch_size 8 --accum_iter 16 --epochs 1 --warmup_epoc
 ### small test
 python  main_pretrain.py --model mae_vit_base_patch16_small --batch_size 8 --accum_iter 16 --epochs 30 --warmup_epochs 1 --input_size 96 --patch_size 8 --mask_ratio 0.75 --model_type group_c --dataset_type grid --grouped_bands 0 --grouped_bands 1 --blr 0.0001 --num_workers 8 --input_channels 2 --output_dir ./output_dir_small --log_dir ./output_dir_small	
 
+### ww
+python  ww_test.py --model mae_vit_base_patch16_small --batch_size 8 --accum_iter 16 --epochs 30 --warmup_epochs 1 --input_size 96 --patch_size 8 --mask_ratio 0.75 --model_type group_c --dataset_type grid --grouped_bands 0 --grouped_bands 1 --blr 0.0001 --num_workers 8 --input_channels 2 --output_dir ./output_dir_small --log_dir ./output_dir_small	 --weightwatcher_path ww_test_details_small.csv
 
 
 ### TODO
@@ -140,6 +142,7 @@ python  main_pretrain.py --model mae_vit_base_patch16_small --batch_size 8 --acc
 - The Hard Part
 	- geospatial inference [BASICS DONE]
 		- Check for edge cases
+	- reference dataset - take from first of the list [currently hardcoded a trial]		
 	
 
 
