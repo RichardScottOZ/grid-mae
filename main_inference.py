@@ -335,10 +335,10 @@ def main(args):
 
 
     #print(srcMeta)
-    saveResultsFeatures(result, 'result3.tif', downscale=args.input_size)
+    saveResultsFeatures(result, args.output_dir + '/result3.tif', downscale=args.input_size)
 
     #no cls version for comparison
-    saveResultsFeatures(resultcls, 'result3cls.tif', downscale=args.input_size)
+    saveResultsFeatures(resultcls, args.output_dir + '/result3cls.tif', downscale=args.input_size)
     
 
     from sklearn.decomposition import PCA
@@ -352,7 +352,7 @@ def main(args):
     vecs[validPcaPoints==False] = 0
     vecs = vecs.reshape( result_height,result_width, -1 )
 
-    saveResultsFeatures(vecs,  'vec3.tif', downscale=args.input_size)
+    saveResultsFeatures(vecs,  args.output_dir + '/vec3.tif', downscale=args.input_size)
 
     #no cls version for comparison
     pca.fit( resultcls.reshape(-1,outputFeatures)[validPcaPoints] )
@@ -361,7 +361,7 @@ def main(args):
     vecs[validPcaPoints==False] = 0
     vecs = vecs.reshape( result_height,result_width, -1 )
 
-    saveResultsFeatures(vecs,  'veccls3.tif', downscale=args.input_size)
+    saveResultsFeatures(vecs,  args.output_dir + '/veccls3.tif', downscale=args.input_size)
     #vec notes update
 
 if __name__ == '__main__':
