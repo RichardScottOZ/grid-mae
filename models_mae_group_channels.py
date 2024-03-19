@@ -472,7 +472,19 @@ def mae_vit_large_patch16_dec512d8b(**kwargs):
         mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
     return model
 
+#### new versions ###########
+
+def mae_vit_base_patch16_smalltest(**kwargs):
+    model = MaskedAutoencoderGroupChannelViT(
+        channel_embed=32, embed_dim=96, depth=2, num_heads=2,
+        decoder_channel_embed=16, decoder_embed_dim=64, decoder_depth=2, decoder_num_heads=2,
+        mlp_ratio=1, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
+    return model
+
+
 
 # set recommended archs
 mae_vit_base_patch16 = mae_vit_base_patch16_dec512d8b  # decoder: 512 dim, 8 blocks
 mae_vit_large_patch16 = mae_vit_large_patch16_dec512d8b  # decoder: 512 dim, 8 blocks
+
+mae_vit_base_patch16_small = mae_vit_base_patch16_smalltest  # decoder: 64 dim, 2 blocks
