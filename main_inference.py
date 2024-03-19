@@ -106,9 +106,10 @@ def load_model(args, model_without_ddp, optimizer, loss_scaler):
                 loss_scaler.load_state_dict(checkpoint['scaler'])
             print("With optim & sched!")
 
-def saveResultsFeatures(image, outName,downscale=96,x0=0,y0=0,nodata=None):
+def saveResultsFeatures(image, raster_name, outName,downscale=96,x0=0,y0=0,nodata=None):
     dataDir = args.train_path.replace('train.csv','')
-    refName = dataDir + "grid/magnetics.tif"
+    #refName = dataDir + "grid/magnetics.tif"
+    refName = dataDir + "grid/" + raster_name + ".tif"
 
     if len(image.shape)==2:
        outH,outW = image.shape
@@ -335,10 +336,10 @@ def main(args):
 
 
     #print(srcMeta)
-    saveResultsFeatures(result, args.output_dir + '/result3.tif', downscale=args.input_size)
+    saveResultsFeatures(result, srcMeta[0]['name'], args.output_dir + '/result3.tif', downscale=args.input_size)
 
     #no cls version for comparison
-    saveResultsFeatures(resultcls, args.output_dir + '/result3cls.tif', downscale=args.input_size)
+    saveResultsFeatures(resultcls, srcMeta[0]['name'], args.output_dir + '/result3cls.tif', downscale=args.input_size)
     
 
     from sklearn.decomposition import PCA
@@ -352,7 +353,7 @@ def main(args):
     vecs[validPcaPoints==False] = 0
     vecs = vecs.reshape( result_height,result_width, -1 )
 
-    saveResultsFeatures(vecs,  args.output_dir + '/vec3.tif', downscale=args.input_size)
+    saveResultsFeatures(vecs, srcMeta[0]['name'], args.output_dir + '/vec3.tif', downscale=args.input_size)
 
     #no cls version for comparison
     pca.fit( resultcls.reshape(-1,outputFeatures)[validPcaPoints] )
@@ -361,7 +362,7 @@ def main(args):
     vecs[validPcaPoints==False] = 0
     vecs = vecs.reshape( result_height,result_width, -1 )
 
-    saveResultsFeatures(vecs,  args.output_dir + '/veccls3.tif', downscale=args.input_size)
+    saveResultsFeatures(vecs, srcMeta[0]['name'], args.output_dir + '/veccls3.tif', downscale=args.input_size)
     #vec notes update
 
 if __name__ == '__main__':
