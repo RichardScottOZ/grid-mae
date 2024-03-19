@@ -202,6 +202,9 @@ def main(args):
     print("IntSum:",srcUseful[::args.input_size,::args.input_size].sum())
 
     result = np.zeros( (result_height, result_width, outputFeatures), dtype=np.float32 )
+
+    resultcls = np.zeros( (result_height, result_width, outputFeatures), dtype=np.float32 )
+
     print("RESULT SHAPE:",result.shape)
 
     batch = np.empty((args.batch_size,args.input_size,args.input_size, args.input_channels))
@@ -238,7 +241,7 @@ def main(args):
     model.blocks[11].mlp.fc2.register_forward_hook(get_block11("block11hook"))
     #model.decoder_embed.register_forward_hook(get_decembed("decembedhook"))
 
-
+    
     def flushTargets():
         #get pred here
             
@@ -296,8 +299,8 @@ def main(args):
         for tileid, (x,y) in enumerate(targets):
             # work out borders and centres and things here
 
-            print("TARGETS ID, X, Y",tileid,(x,y),"TW:",tile_width,"TH:",tile_height)
-            pass
+            #print("TARGETS ID, X, Y",tileid,(x,y),"TW:",tile_width,"TH:",tile_height)
+            #pass
             #result[y:y+th, x:x+tw] = stuff from predictions yet to work out
             #loss, ms_loss, pred, mask = print(predictions)
             
@@ -305,12 +308,14 @@ def main(args):
             #print(normhook['block11hook'][tileid,:,:].detach().numpy().shape)
             result[y,x] = normhook['block11hook'][tileid,:,:].detach().numpy().mean(axis=0)
 
+            resultcls[y,x] = normhook['block11hook'][tileid,1:,:].detach().numpy().mean(axis=0)
+
         #print("RESULT SHAPE:",result.shape)
-        print("RESULT MEAN AFTER:",result.mean())
+        #print("RESULT MEAN AFTER:",result.mean())
 
         #quit()
 
-    for y in range(result_height):
+    for y in tqdm(range(result_height)):
         yStart = y * tile_height
         for x in range(result_width):
             #xStart = x * tile_width
@@ -324,7 +329,7 @@ def main(args):
 
             if batch_count >= batch_length:
                 flushTargets()
-                print(batch.mean())
+                #print(batch.mean())
                 targets = []
                 batch_count = 0
 
@@ -332,6 +337,8 @@ def main(args):
     #print(srcMeta)
     saveResultsFeatures(result, 'result3.tif', downscale=args.input_size)
 
+    #no cls version for comparison
+    saveResultsFeatures(resultcls, 'result3cls.tif', downscale=args.input_size)
     
 
     from sklearn.decomposition import PCA
@@ -346,6 +353,16 @@ def main(args):
     vecs = vecs.reshape( result_height,result_width, -1 )
 
     saveResultsFeatures(vecs,  'vec3.tif', downscale=args.input_size)
+
+    #no cls version for comparison
+    pca.fit( resultcls.reshape(-1,outputFeatures)[validPcaPoints] )
+
+    vecs = pca.transform(  resultcls.reshape(-1,outputFeatures) )
+    vecs[validPcaPoints==False] = 0
+    vecs = vecs.reshape( result_height,result_width, -1 )
+
+    saveResultsFeatures(vecs,  'veccls3.tif', downscale=args.input_size)
+    #vec notes update
 
 if __name__ == '__main__':
     args = get_args_parser()
