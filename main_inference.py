@@ -239,7 +239,8 @@ def main(args):
         #return hook
 
     model.norm.register_forward_hook(get_normhook("normhook"))
-    model.blocks[11].mlp.fc2.register_forward_hook(get_block11("block11hook"))
+    #model.blocks[11].mlp.fc2.register_forward_hook(get_block11("block11hook"))
+    model.blocks[-1].mlp.fc2.register_forward_hook(get_block11("block11hook"))
     #model.decoder_embed.register_forward_hook(get_decembed("decembedhook"))
 
     
