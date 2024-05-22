@@ -25,7 +25,7 @@ https://github.com/RichardScottOZ/satmae_pp/tree/main
 
 ### DATA
 - Trained on https://github.com/fMoW/dataset [70GB tarball] https://purl.stanford.edu/vg497cb6002
-	- To invesigate structure
+	- To investigate structure
 	- Presumably 3 band groupings for 10, 20 and 60m resolution patches around pictures of locations of interest - airports, zoos, etc.
 	- Designed to classify these
 ### METADATA
