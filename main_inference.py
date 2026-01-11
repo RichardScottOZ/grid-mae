@@ -15,6 +15,7 @@ import timm.optim.optim_factory as optim_factory
 import util.misc as misc
 from util.datasets import build_grid_dataset, getRasterLayers
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
+from util.misc import normalize_data_dir
 
 import models_mae
 import models_mae_group_channels
@@ -108,7 +109,6 @@ def load_model(args, model_without_ddp, optimizer, loss_scaler):
             print("With optim & sched!")
 
 def saveResultsFeatures(image, raster_name, outName, data_dir='dataset/grid/grid/', downscale=96, x0=0, y0=0, nodata=None):
-    from util.misc import normalize_data_dir
     # Ensure data_dir ends with a slash
     data_dir = normalize_data_dir(data_dir)
     refName = data_dir + raster_name + ".tif"

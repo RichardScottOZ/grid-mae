@@ -18,6 +18,8 @@ from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from PIL import Image
 
+from util.misc import normalize_data_dir
+
 log = logging.getLogger()
 log.setLevel(logging.ERROR)
 
@@ -28,7 +30,6 @@ warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 CATEGORIES = ["gravity", "magnetics"]
 
 def getRasterLayers(csv_path, data_dir='dataset/grid/grid/'):
-    from util.misc import normalize_data_dir
     df_grid = pd.read_csv(csv_path)
 
     grid_dict = {}
@@ -192,8 +193,6 @@ class GridIndividualImageDataset(GridDataset):
         self.base_path = '/'
         self.data_dir = data_dir
         
-        # Import normalize_data_dir utility
-        from util.misc import normalize_data_dir
         # Ensure data_dir ends with a slash
         self.data_dir = normalize_data_dir(self.data_dir)
         
