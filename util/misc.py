@@ -347,10 +347,33 @@ def get_default_grouped_bands(num_channels):
     Generate default grouped bands for a given number of channels.
     Each channel is grouped individually by default.
     
-    :param num_channels: Number of input channels
-    :return: List of lists, where each inner list contains a single channel index
-    
+    Args:
+        num_channels: Number of input channels
+        
+    Returns:
+        List of lists, where each inner list contains a single channel index
+        
     Example:
-        get_default_grouped_bands(3) returns [[0], [1], [2]]
+        >>> get_default_grouped_bands(3)
+        [[0], [1], [2]]
     """
     return [[i] for i in range(num_channels)]
+
+
+def normalize_data_dir(data_dir):
+    """
+    Ensure data directory path ends with a trailing slash.
+    
+    Args:
+        data_dir: Directory path string
+        
+    Returns:
+        Normalized directory path with trailing slash
+        
+    Example:
+        >>> normalize_data_dir('dataset/grid/grid')
+        'dataset/grid/grid/'
+    """
+    if not data_dir.endswith('/'):
+        data_dir += '/'
+    return data_dir

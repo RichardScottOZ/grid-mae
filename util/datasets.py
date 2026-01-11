@@ -28,6 +28,7 @@ warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 CATEGORIES = ["gravity", "magnetics"]
 
 def getRasterLayers(csv_path, data_dir='dataset/grid/grid/'):
+    from util.misc import normalize_data_dir
     df_grid = pd.read_csv(csv_path)
 
     grid_dict = {}
@@ -37,8 +38,7 @@ def getRasterLayers(csv_path, data_dir='dataset/grid/grid/'):
     srcMeta = []
     
     # Ensure data_dir ends with a slash
-    if not data_dir.endswith('/'):
-        data_dir += '/'
+    data_dir = normalize_data_dir(data_dir)
     
     for index, row in df_grid.iterrows():
         print("stats for:",row['category'])
@@ -192,9 +192,10 @@ class GridIndividualImageDataset(GridDataset):
         self.base_path = '/'
         self.data_dir = data_dir
         
+        # Import normalize_data_dir utility
+        from util.misc import normalize_data_dir
         # Ensure data_dir ends with a slash
-        if not self.data_dir.endswith('/'):
-            self.data_dir += '/'
+        self.data_dir = normalize_data_dir(self.data_dir)
         
         self.batch_size = batch_size
         # Use input_size for batch dimensions instead of hardcoded values

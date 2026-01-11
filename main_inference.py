@@ -108,9 +108,9 @@ def load_model(args, model_without_ddp, optimizer, loss_scaler):
             print("With optim & sched!")
 
 def saveResultsFeatures(image, raster_name, outName, data_dir='dataset/grid/grid/', downscale=96, x0=0, y0=0, nodata=None):
+    from util.misc import normalize_data_dir
     # Ensure data_dir ends with a slash
-    if not data_dir.endswith('/'):
-        data_dir += '/'
+    data_dir = normalize_data_dir(data_dir)
     refName = data_dir + raster_name + ".tif"
 
     if len(image.shape)==2:
