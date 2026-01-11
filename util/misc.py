@@ -340,3 +340,17 @@ def all_reduce_mean(x):
         return x_reduce.item()
     else:
         return x
+
+
+def get_default_grouped_bands(num_channels):
+    """
+    Generate default grouped bands for a given number of channels.
+    Each channel is grouped individually by default.
+    
+    :param num_channels: Number of input channels
+    :return: List of lists, where each inner list contains a single channel index
+    
+    Example:
+        get_default_grouped_bands(3) returns [[0], [1], [2]]
+    """
+    return [[i] for i in range(num_channels)]

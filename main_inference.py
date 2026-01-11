@@ -148,8 +148,7 @@ def main(args):
         # Workaround because action append will add to default list
         if len(args.grouped_bands) == 0:
             # Create default grouped_bands based on input_channels
-            # Group each channel individually by default
-            args.grouped_bands = [[i] for i in range(args.input_channels)]
+            args.grouped_bands = misc.get_default_grouped_bands(args.input_channels)
 
         print(f"Grouping bands {args.grouped_bands}")
         model = models_mae_group_channels.__dict__[args.model](img_size=args.input_size,
