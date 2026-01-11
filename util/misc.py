@@ -348,10 +348,10 @@ def get_default_grouped_bands(num_channels):
     Each channel is grouped individually by default.
     
     Args:
-        num_channels: Number of input channels
+        num_channels (int): Number of input channels
         
     Returns:
-        List of lists, where each inner list contains a single channel index
+        list: List of lists, where each inner list contains a single channel index
         
     Example:
         >>> get_default_grouped_bands(3)
@@ -365,10 +365,10 @@ def normalize_data_dir(data_dir):
     Ensure data directory path ends with a trailing slash.
     
     Args:
-        data_dir: Directory path string
+        data_dir (str): Directory path string
         
     Returns:
-        Normalized directory path with trailing slash
+        str: Normalized directory path with trailing slash
         
     Example:
         >>> normalize_data_dir('dataset/grid/grid')
