@@ -18,6 +18,8 @@ from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from PIL import Image
 
+from util.misc import normalize_data_dir
+
 log = logging.getLogger()
 log.setLevel(logging.ERROR)
 
@@ -27,7 +29,7 @@ warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 
 CATEGORIES = ["gravity", "magnetics"]
 
-def getRasterLayers(csv_path):
+def getRasterLayers(csv_path, data_dir='dataset/grid/grid/'):
     df_grid = pd.read_csv(csv_path)
 
     grid_dict = {}
@@ -36,12 +38,15 @@ def getRasterLayers(csv_path):
     
     srcMeta = []
     
+    # Ensure data_dir ends with a slash
+    data_dir = normalize_data_dir(data_dir)
+    
     for index, row in df_grid.iterrows():
         print("stats for:",row['category'])
         srcMeta.append({"name":row['category'], "loss":"mse"})
 
     for srcData in srcMeta:
-        with rasterio.open('dataset/grid/grid/' + srcData['name'] + '.tif') as src:
+        with rasterio.open(data_dir + srcData['name'] + '.tif') as src:
             "getRLsrc:",print(src.meta)
             data = src.read(1, masked=True)
             mean.append(np.nanmean(data))
@@ -164,7 +169,9 @@ class GridIndividualImageDataset(GridDataset):
                  masked_bands: Optional[List[int]] = None,
                  dropped_bands = [0, 9, 10],
                  batch_size = None,
-                 input_channels = None):
+                 input_channels = None,
+                 input_size = 96,
+                 data_dir = 'dataset/grid/grid/'):
         """
         Creates dataset for multi-spectral single image classification.
         Usually used for fMoW-Sentinel dataset.
@@ -175,17 +182,24 @@ class GridIndividualImageDataset(GridDataset):
         :param label_type: 'values' for single label, 'one-hot' for one hot labels
         :param masked_bands: List of indices corresponding to which bands to mask out
         :param dropped_bands:  List of indices corresponding to which bands to drop from input image tensor
+        :param batch_size: Size of batches to generate
+        :param input_channels: Number of input channels
+        :param input_size: Size of input tiles (width and height)
+        :param data_dir: Directory containing grid data files
         """
         #super().__init__(in_c=13)
         super().__init__(in_c=input_channels)
         self.csv_path = csv_path
         self.base_path = '/'
+        self.data_dir = data_dir
+        
+        # Ensure data_dir ends with a slash
+        self.data_dir = normalize_data_dir(self.data_dir)
         
         self.batch_size = batch_size
-        #self.batch_width = 224
-        self.batch_width = 96
-        #self.batch_height = 224  #hardcode a default start for now
-        self.batch_height = 96
+        # Use input_size for batch dimensions instead of hardcoded values
+        self.batch_width = input_size
+        self.batch_height = input_size
         self.cursor = 0
 
         # extract base folder path from csv file path
@@ -238,7 +252,7 @@ class GridIndividualImageDataset(GridDataset):
             self.srcMeta.append({"name":row['category'], "loss":"mse"})
 
         for srcData in self.srcMeta:
-            with rasterio.open('dataset/grid/grid/' + srcData['name'] + '.tif') as src:
+            with rasterio.open(self.data_dir + srcData['name'] + '.tif') as src:
                 print("selfsrcmeta:",src.meta)
                 data = src.read(1, masked=True)
                 self.mean.append(np.nanmean(data))
@@ -517,7 +531,9 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
     if args.dataset_type == 'grid':
         print(args.batch_size)
 
-        rasters, mask = getRasterLayers(args.train_path)
+        # Get data_dir from args, with default fallback
+        data_dir = getattr(args, 'data_dir', 'dataset/grid/grid/')
+        rasters, mask = getRasterLayers(args.train_path, data_dir)
 
         #print(rasters)
 
@@ -531,7 +547,7 @@ def build_grid_dataset(is_train: bool, args) -> GridDataset:
 
         transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, mean, std) # input_size*2 = 96*2 = 192
         #transform = GridIndividualImageDataset.build_transform(is_train, args.input_size*4, np.asarray(mean), np.asarray(std)) # input_size*2 = 96*2 = 192
-        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands, batch_size=args.batch_size, input_channels=args.input_channels)
+        dataset = GridIndividualImageDataset(file_path, transform, masked_bands=args.masked_bands, dropped_bands=args.dropped_bands, batch_size=args.batch_size, input_channels=args.input_channels, input_size=args.input_size, data_dir=data_dir)
 
         #mean = GridIndividualImageDataset.mean
         #std = GridIndividualImageDataset.std

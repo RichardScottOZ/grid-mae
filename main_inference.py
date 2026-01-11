@@ -15,6 +15,7 @@ import timm.optim.optim_factory as optim_factory
 import util.misc as misc
 from util.datasets import build_grid_dataset, getRasterLayers
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
+from util.misc import normalize_data_dir
 
 import models_mae
 import models_mae_group_channels
@@ -57,6 +58,7 @@ def get_args_parser():
 
     # Dataset parameters
     parser.add_argument('--train_path', default='dataset/grid/train.csv', type=str, help='Train .csv path')
+    parser.add_argument('--data_dir', default='dataset/grid/grid/', type=str, help='Directory containing grid data files')
     parser.add_argument('--dataset_type', default='grid', choices=['rgb', 'sentinel', 'grid'],
                         help='Whether to use fmow rgb, sentinel, or other dataset.')
     parser.add_argument('--masked_bands', type=int, nargs='+', default=None,
@@ -106,10 +108,10 @@ def load_model(args, model_without_ddp, optimizer, loss_scaler):
                 loss_scaler.load_state_dict(checkpoint['scaler'])
             print("With optim & sched!")
 
-def saveResultsFeatures(image, raster_name, outName,downscale=96,x0=0,y0=0,nodata=None):
-    dataDir = args.train_path.replace('train.csv','')
-    #refName = dataDir + "grid/magnetics.tif"
-    refName = dataDir + "grid/" + raster_name + ".tif"
+def saveResultsFeatures(image, raster_name, outName, data_dir='dataset/grid/grid/', downscale=96, x0=0, y0=0, nodata=None):
+    # Ensure data_dir ends with a slash
+    data_dir = normalize_data_dir(data_dir)
+    refName = data_dir + raster_name + ".tif"
 
     if len(image.shape)==2:
        outH,outW = image.shape
@@ -144,13 +146,14 @@ def saveResultsFeatures(image, raster_name, outName,downscale=96,x0=0,y0=0,nodat
 def main(args):
     if args.model_type == 'group_c':
         # Workaround because action append will add to default list
-        if len(args.grouped_bands) == 0:  #need to handle
-            args.grouped_bands = [[0, 1, 2, 6], [3, 4, 5, 7], [8, 9]]  ##sentinel 2 default with 3 dropped bands
+        if len(args.grouped_bands) == 0:
+            # Create default grouped_bands based on input_channels
+            args.grouped_bands = misc.get_default_grouped_bands(args.input_channels)
 
         print(f"Grouping bands {args.grouped_bands}")
         model = models_mae_group_channels.__dict__[args.model](img_size=args.input_size,
                                                                patch_size=args.patch_size,
-                                                               in_chans=2,
+                                                               in_chans=args.input_channels,
                                                                channel_groups=args.grouped_bands,
                                                                spatial_mask=args.spatial_mask,
                                                                norm_pix_loss=args.norm_pix_loss)
@@ -186,7 +189,8 @@ def main(args):
 
     dataset_inference = build_grid_dataset(is_train=False, args=args)
 
-    srcMeta, srcUseful = getRasterLayers(args.train_path)
+    data_dir = getattr(args, 'data_dir', 'dataset/grid/grid/')
+    srcMeta, srcUseful = getRasterLayers(args.train_path, data_dir)
 
     input_shape = srcUseful.shape
     print("INPUT SHAPE:",input_shape)
@@ -337,10 +341,10 @@ def main(args):
 
 
     #print(srcMeta)
-    saveResultsFeatures(result, srcMeta[0]['name'], args.output_dir + '/result3.tif', downscale=args.input_size)
+    saveResultsFeatures(result, srcMeta[0]['name'], args.output_dir + '/result3.tif', data_dir=data_dir, downscale=args.input_size)
 
     #no cls version for comparison
-    saveResultsFeatures(resultcls, srcMeta[0]['name'], args.output_dir + '/result3cls.tif', downscale=args.input_size)
+    saveResultsFeatures(resultcls, srcMeta[0]['name'], args.output_dir + '/result3cls.tif', data_dir=data_dir, downscale=args.input_size)
     
 
     from sklearn.decomposition import PCA
@@ -354,7 +358,7 @@ def main(args):
     vecs[validPcaPoints==False] = 0
     vecs = vecs.reshape( result_height,result_width, -1 )
 
-    saveResultsFeatures(vecs, srcMeta[0]['name'], args.output_dir + '/vec3.tif', downscale=args.input_size)
+    saveResultsFeatures(vecs, srcMeta[0]['name'], args.output_dir + '/vec3.tif', data_dir=data_dir, downscale=args.input_size)
 
     #no cls version for comparison
     pca.fit( resultcls.reshape(-1,outputFeatures)[validPcaPoints] )
@@ -363,7 +367,7 @@ def main(args):
     vecs[validPcaPoints==False] = 0
     vecs = vecs.reshape( result_height,result_width, -1 )
 
-    saveResultsFeatures(vecs, srcMeta[0]['name'], args.output_dir + '/veccls3.tif', downscale=args.input_size)
+    saveResultsFeatures(vecs, srcMeta[0]['name'], args.output_dir + '/veccls3.tif', data_dir=data_dir, downscale=args.input_size)
     #vec notes update
 
 if __name__ == '__main__':

@@ -49,6 +49,7 @@ def get_args_parser():
 
     # Dataset parameters
     parser.add_argument('--train_path', default='dataset/grid/train.csv', type=str, help='Train .csv path')
+    parser.add_argument('--data_dir', default='dataset/grid/grid/', type=str, help='Directory containing grid data files')
     parser.add_argument('--dataset_type', default='grid', choices=['rgb', 'sentinel', 'grid'],
                         help='Whether to use fmow rgb, sentinel, or other dataset.')
     parser.add_argument('--masked_bands', type=int, nargs='+', default=None,
@@ -103,13 +104,14 @@ def load_model(args, model_without_ddp, optimizer, loss_scaler):
 def main(args):
     if args.model_type == 'group_c':
         # Workaround because action append will add to default list
-        if len(args.grouped_bands) == 0:  #need to handle
-            args.grouped_bands = [[0, 1, 2, 6], [3, 4, 5, 7], [8, 9]]  ##sentinel 2 default with 3 dropped bands
+        if len(args.grouped_bands) == 0:
+            # Create default grouped_bands based on input_channels
+            args.grouped_bands = misc.get_default_grouped_bands(args.input_channels)
 
         print(f"Grouping bands {args.grouped_bands}")
         model = models_mae_group_channels.__dict__[args.model](img_size=args.input_size,
                                                                patch_size=args.patch_size,
-                                                               in_chans=2,
+                                                               in_chans=args.input_channels,
                                                                channel_groups=args.grouped_bands,
                                                                spatial_mask=args.spatial_mask,
                                                                norm_pix_loss=args.norm_pix_loss)
